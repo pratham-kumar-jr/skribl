@@ -2,7 +2,7 @@
   "name": "skribl-be",
   "version": "1.0.0",
   "description": "",
-  "private":true,
+  "private": true,
   "main": "build/server.js",
   "scripts": {
     "build": "tsc",
@@ -19,7 +19,7 @@
     "@typescript-eslint/parser": "^5.14.0",
     "eslint": "^8.11.0",
     "eslint-config-google": "^0.14.0",
-    "husky": "^7.0.4",
+    "husky": "^4.3.8",
     "lint-staged": "^12.3.5",
     "nodemon": "^2.0.15",
     "prettier": "^2.5.1",
