@@ -1,16 +1,18 @@
-import React, { useState } from "react";
+import { observer } from "mobx-react";
+import React, { useEffect, useState } from "react";
 import Avator from "../components/Avator";
 import Button from "../components/Button";
 import DropDown from "../components/DropDown";
-import { Player } from "../models/entities/Player";
+import { UserRole } from "../models/entities/Player";
 import { gameService } from "../services/GameService";
+import { gameStore } from "../store/GameStore";
 
 interface Props {}
 
 const LobbyPage: React.FC<Props> = (props) => {
-  const [round, setRound] = useState(4);
-  const [time, setTime] = useState(60);
-  const [players, setPlayers] = useState<Player[]>([]);
+  const {players,roomId,me,setting} = gameStore
+
+  const disabled = me?.role === UserRole.JOINER;
 
   const roundOptions = Array(8)
     .fill(0)
@@ -30,21 +32,20 @@ const LobbyPage: React.FC<Props> = (props) => {
       </>
     ));
 
-  const handleStartGame = () => {
-      gameService.onStartClient({
-          players,
-          round,
-          time
-      });
-  };
+  const handleStartGame = () => {};
 
   const handleRoundChange = (event: any) => {
-    setRound(event.target.value);
+    setting.total_rounds = +event.target.value;
   };
 
   const handleTimeChange = (event: any) => {
-    setTime(event.target.value);
+    setting.round_time = +event.target.value;
   };
+
+
+  useEffect(()=>{
+    gameService.roomSyncClient(setting);
+  },[setting.round_time,setting.total_rounds,me?.role]);
 
   return (
     <div className="m-2 flex flex-row justify-around items-center">
@@ -53,23 +54,26 @@ const LobbyPage: React.FC<Props> = (props) => {
         <DropDown
           id="rounds"
           title="No Of Rounds :"
-          value={round}
+          value={setting.total_rounds}
           onChange={handleRoundChange}
+          disabled={disabled}
         >
           {roundOptions}
         </DropDown>
         <DropDown
           id="time"
           title="Time Each Round :"
-          value={time}
+          value={setting.round_time}
           onChange={handleTimeChange}
+          disabled={disabled}
         >
           {timeOptions}
         </DropDown>
 
-        <Button className="mx-auto my-2" onClick={handleStartGame}> Start Game</Button>
+        <Button className="mx-auto my-2 " onClick={handleStartGame} disabled={disabled}> Start Game</Button>
+        <h2 className=" mt-2 px-4 text-lg font-medium">Invite Link : {roomId} </h2>
       </div>
-      <div className="w-96 h-96 ">
+      <div className="w-96 h-96 flex justify-around flex-wrap ">
         {players.map((player) => (
           <Avator name={player.name}></Avator>
         ))}
@@ -80,4 +84,4 @@ const LobbyPage: React.FC<Props> = (props) => {
 
 LobbyPage.defaultProps = {};
 
-export default React.memo(LobbyPage);
+export default observer(LobbyPage);

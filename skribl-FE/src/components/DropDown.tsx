@@ -6,6 +6,7 @@ interface Props {
   id: string;
   children: ReactNode;
   onChange: (e: any) => void;
+  disabled?:boolean
 }
 
 const DropDown: React.FC<Props> = (props) => {
@@ -15,8 +16,9 @@ const DropDown: React.FC<Props> = (props) => {
       <select
         value={props.value}
         onChange={props.onChange}
-        className=" bg-transparent focus:outline-none w-24 border-2 border-x-pink-400 text-center border-y-blue-400 border-opacity-80   rounded-md"
+        className=" disabled:opacity-60 bg-transparent focus:outline-none w-24 border-2 border-x-pink-400 text-center border-y-blue-400 border-opacity-80   rounded-md"
         id={props.id}
+        disabled={props.disabled}
       >
         {props.children}
       </select>

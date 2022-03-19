@@ -4,9 +4,7 @@ import { webSocketService } from "./WebSocketService";
 class RoundService {
   private static _instance: RoundService | null;
 
-  private constructor() {
-    console.log("");
-  }
+  private constructor() {}
 
   public static getInstance(): RoundService {
     if (!RoundService._instance) {
@@ -16,48 +14,30 @@ class RoundService {
   }
 
   public init() {
+    webSocketService.RegisterEvent(EventTypeEnum.CHAT, this.onChatServer);
+    webSocketService.RegisterEvent(EventTypeEnum.DRAW, this.onDrawServer);
     webSocketService.RegisterEvent(
-      EventTypeEnum.CHAT_SERVER,
-      this.onChatServer
-    );
-    webSocketService.RegisterEvent(
-      EventTypeEnum.DRAW_SERVER,
-      this.onDrawServer
-    );
-    webSocketService.RegisterEvent(
-      EventTypeEnum.WORD_REVEAL_SERVER,
+      EventTypeEnum.WORD_REVEAL,
       this.onWordRevealServer
     );
     webSocketService.RegisterEvent(
-      EventTypeEnum.ROUND_SYNC_SERVER,
+      EventTypeEnum.ROUND_SYNC,
       this.onRoundSyncServer
     );
     console.log("[Round Service] Intialized");
   }
 
-  public onChatClient() {
-    console.log("");
-  }
+  public onChatClient() {}
 
-  public onDrawClient() {
-    console.log("");
-  }
+  public onDrawClient() {}
 
-  public onChatServer() {
-    console.log("");
-  }
+  public onChatServer() {}
 
-  public onWordRevealServer() {
-    console.log("");
-  }
+  public onWordRevealServer() {}
 
-  public onRoundSyncServer() {
-    console.log("");
-  }
+  public onRoundSyncServer() {}
 
-  public onDrawServer() {
-    console.log("");
-  }
+  public onDrawServer() {}
 }
 
 export const roundService = RoundService.getInstance();

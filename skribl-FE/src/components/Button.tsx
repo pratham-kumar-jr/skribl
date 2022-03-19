@@ -5,6 +5,7 @@ interface Props {
   onClick?: (event: any) => void;
   className?: string;
   type?: "button" | "submit";
+  disabled?:boolean
 }
 
 const Button: React.FC<Props> = (props) => {
@@ -13,8 +14,9 @@ const Button: React.FC<Props> = (props) => {
       type={props.type}
       className={`border-2 border-x-blue-400 border-opacity-80 
                 border-y-pink-400 p-2 rounded-md 
-                text-center w-40 shadow-md hover:text-lg h-12 ${props.className}`}
+                text-center w-40 shadow-md hover:text-lg h-12  disabled:opacity-60 ${props.className}`}
       onClick={props.onClick}
+      disabled={props.disabled}
     >
       {props.children}
     </button>

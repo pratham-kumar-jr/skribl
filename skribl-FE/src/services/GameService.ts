@@ -1,19 +1,23 @@
 import { EventTypeEnum } from "../enums/EventTypeEnum";
 import { GamestateEnum } from "../enums/GameState";
-import { Game } from "../models/entities/Game";
-import { Player } from "../models/entities/Player";
+import { Player, UserRole } from "../models/entities/Player";
+import { RoomSetting } from "../models/interface/RoomSetting";
+import { gameStore } from "../store/GameStore";
 import { roundService } from "./RoundService";
 import { webSocketService } from "./WebSocketService";
 
+interface Response {
+  players?: Player[];
+  game_state?: GamestateEnum;
+  room_id?: string;
+  settings?: RoomSetting;
+  me?: Player;
+}
+
 class GameService {
   private static _instance: GameService | null;
-  private game: Game;
 
-  private constructor() {
-    this.game = {
-      game_state: GamestateEnum.NONE,
-    };
-  }
+  private constructor() {}
 
   public static getInstance(): GameService {
     if (!GameService._instance) {
@@ -24,63 +28,50 @@ class GameService {
 
   public init() {
     webSocketService.init();
+
     webSocketService.RegisterEvent(
-      EventTypeEnum.CREATE_GAME_SERVER,
-      this.onCreateRoomServer
+      EventTypeEnum.START_GAME,
+      this.startGameServer
     );
+
     webSocketService.RegisterEvent(
-      EventTypeEnum.JOIN_GAME_SERVER,
-      this.onJoinRoomServer
+      EventTypeEnum.ROOM_SYNC,
+      this.roomSyncServer
     );
-    webSocketService.RegisterEvent(
-      EventTypeEnum.START_SERVER,
-      this.onStartServer
-    );
-    webSocketService.RegisterEvent(
-      EventTypeEnum.ROOM_SYNC_SERVER,
-      this.onRoomSyncServer
-    );
-    webSocketService.RegisterEvent(EventTypeEnum.END_SERVER, this.onEndServer);
+
+    webSocketService.RegisterEvent(EventTypeEnum.END_GAME, this.endGameServer);
     roundService.init();
     console.log("[Game Service] Intialized");
   }
 
-  public onCreateRoomClient() {
-    console.log("");
+  public createRoomClient(player: Player) {
+    webSocketService.EmitEvent(EventTypeEnum.CREATE_GAME, { player });
   }
 
-  public onJoinRoomClient() {
-    console.log("");
+  public joinRoomClient(roomId: string, player: Player) {
+    webSocketService.EmitEvent(EventTypeEnum.JOIN_GAME, { roomId, player });
   }
 
-  public onStartClient(data: any) {
-    console.log("");
+  public roomSyncClient(settings: RoomSetting) {
+    webSocketService.EmitEvent(EventTypeEnum.ROOM_SYNC, settings);
   }
 
-  public onCreateRoomServer() {
-    console.log("");
+  public roomSyncServer(res: Response) {
+    if (res.game_state) gameStore.setGameState(res.game_state);
+    if (res.players) gameStore.setPlayers(res.players);
+    if (res.me) gameStore.setMe(res.me);
+    if (res.room_id) gameStore.setRoomId(res.room_id);
+    if (res.settings) {
+      gameStore.setSetting(res.settings);
+      console.log(res.settings);
+    }
   }
 
-  public onJoinRoomServer(game: Game) {
-    this.game = game;
-  }
+  public startGameClient(data: any) {}
 
-  public onStartServer() {
-    console.log("");
-  }
+  public startGameServer(state: any) {}
 
-  public onRoomSyncServer(data: {
-    player_change: boolean;
-    players: Player[];
-    game_state: GamestateEnum;
-  }) {
-    if (data.player_change) this.game.players = data.players;
-    this.game.game_state = data.game_state;
-  }
-
-  public onEndServer() {
-    console.log("");
-  }
+  public endGameServer() {}
 }
 
 export const gameService = GameService.getInstance();

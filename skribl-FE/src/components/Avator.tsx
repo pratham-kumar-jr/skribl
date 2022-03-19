@@ -5,9 +5,11 @@ interface Props {
 }
 
 const Avator: React.FC<Props> = ({name}) => {
-  return<div>
-    <div className="w-24 h-24 border"></div>
-    <p className="text-center border-x border-b">{name}</p>
+  return<div className="w-24">
+    <div className="h-24 border-2 border-x-blue-400 border-opacity-80 
+                border-y-pink-400 p-2 "></div>
+    <p className="text-center border-2 border-x-blue-400 border-opacity-80 
+                border-b-pink-400">{name}</p>
   </div>
 }
 
