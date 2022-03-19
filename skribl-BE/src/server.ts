@@ -1,11 +1,16 @@
-import { webSocketService } from "./service/WebSockerService";
+import { webSocketService } from "./service/WebSocketService";
 import express from "express";
 import { createServer } from "http";
+import cors from "cors";
 
 const boot = (port: number) => {
   const app = express();
+  app.use(
+    cors({
+      origin: ["http://localhost:3000"],
+    })
+  );
   const httpServer = createServer(app);
-
   webSocketService.init(httpServer);
 
   httpServer.listen(port, () => {
@@ -13,4 +18,4 @@ const boot = (port: number) => {
   });
 };
 
-boot(3000);
+boot(4000);

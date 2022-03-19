@@ -1,24 +1,41 @@
 import { Socket } from "socket.io";
+import { PlayerDTO } from "../DTOs/PlayerDTO";
 import { mapService } from "../service/MapService";
 import Player from "./Player";
 import BaseSchema from "./_base";
 
+export interface RoomSetting {
+  total_rounds: number;
+  round_time: number;
+}
 class Room extends BaseSchema {
-  private static counter = 0;
+  private _players: string[];
 
-  public constructor() {
-    super("room", Room.counter++);
+  public constructor(id: string, private _roomSetting: RoomSetting) {
+    super(id);
+    this._players = [];
     mapService.addEntity<Room>(this.id, this);
   }
 
-  public addPlayer(socket: Socket) {
-    const player = new Player(socket);
+  public addPlayer(socket: Socket, playerPayload: PlayerDTO): Player {
+    const player = new Player(socket, playerPayload.name, playerPayload.role!);
     player.joinRoom(this.id);
-    const playerIds = mapService.get<string[]>(this.id) || [];
-    if (playerIds.length) {
-      playerIds.push(player.id);
-    }
-    mapService.add<string[]>(this.id, playerIds);
+    this._players.push(player.id);
+    mapService.addEntity<Room>(this.id, this);
+    return player;
+  }
+
+  public get roomSetting(): RoomSetting {
+    return this._roomSetting;
+  }
+
+  public update(payload: RoomSetting) {
+    this._roomSetting = payload;
+    mapService.addEntity<Room>(this.id, this);
+  }
+
+  public get players(): string[] {
+    return this._players;
   }
 }
 

@@ -1,8 +1,8 @@
 abstract class BaseSchema {
-  public id: string;
+  public constructor(private _id: string) {}
 
-  public constructor(nameSpace: String, id: number) {
-    this.id = `${nameSpace}-${id}`;
+  public get id(): string {
+    return this._id;
   }
 }
 
