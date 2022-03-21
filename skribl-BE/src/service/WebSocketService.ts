@@ -29,6 +29,8 @@ class WebSocketService {
       GameHandler.gameCreateHandler(socket);
       GameHandler.gameJoinHandler(socket);
       GameHandler.gameRoomSyncHandler(socket);
+      GameHandler.drawHandler(socket);
+      GameHandler.gameLeaveHandler(socket);
     });
   }
 
@@ -43,6 +45,14 @@ class WebSocketService {
     message: any
   ) {
     socket.to(roomId).emit(event, message);
+  }
+
+  public sendToAll(socket: Socket, event: string, message: any) {
+    socket.broadcast.emit(event, message);
+  }
+
+  public sendToRoomByIO(event: string, roomId: string, message: any) {
+    this.io?.to(roomId).emit(event, message);
   }
 }
 

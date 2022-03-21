@@ -1,4 +1,5 @@
 import BaseSchema from "../model/_base";
+import * as _ from "lodash";
 
 // TODO: Move to Redis
 class MapService {
@@ -13,7 +14,7 @@ class MapService {
     return MapService._instance;
   }
 
-  public addEntity<T extends BaseSchema>(id: string, obj: T): void {
+  public setEntity<T extends BaseSchema>(id: string, obj: T): void {
     this.map[id] = obj;
   }
 
@@ -22,7 +23,7 @@ class MapService {
   }
 
   public remove(id: string) {
-    this.map[id] = undefined;
+    this.map = _.omit(this.map, id);
   }
 
   public add<T = any>(id: string, data: T): void {

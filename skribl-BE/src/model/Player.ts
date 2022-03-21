@@ -12,7 +12,7 @@ class Player extends BaseSchema {
     private _role: UserRoleEnum
   ) {
     super(_socket.id);
-    mapService.addEntity<Player>(this.id, this);
+    mapService.setEntity<Player>(this.id, this);
   }
 
   public joinRoom(roomId: string) {
@@ -31,8 +31,22 @@ class Player extends BaseSchema {
   public get roomId(): string | undefined {
     return this._roomId;
   }
+
   public get role(): UserRoleEnum {
     return this._role;
+  }
+
+  public update(newRole: UserRoleEnum) {
+    this._role = newRole;
+    mapService.setEntity<Player>(this.id, this);
+  }
+
+  public toJson() {
+    return {
+      name: this._name,
+      id: this.id,
+      role: this._role,
+    };
   }
 }
 
