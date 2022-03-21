@@ -21,13 +21,13 @@ const MainPage: React.FC<Props> = (props) => {
 
   const handleCreateRoom = ()=>{
     if(_.isEmpty(name)) return;
-    gameService.createRoomClient({id:gameStore.me?.id || '',name:name,role:UserRole.CREATER})
+    gameService.createRoomClient({id:gameStore.myId || '',name:name,role:UserRole.CREATER})
   }
 
   const handleJoinRoom = ()=>{
     if(_.isEmpty(roomId) || roomId.length !== 8) return;
     if(_.isEmpty(name)) return;
-    gameService.joinRoomClient(roomId,{id:gameStore.me?.id||'',name:name,role:UserRole.JOINER})
+    gameService.joinRoomClient(roomId,{id:gameStore.myId||'',name:name,role:UserRole.JOINER})
   }
 
   return (

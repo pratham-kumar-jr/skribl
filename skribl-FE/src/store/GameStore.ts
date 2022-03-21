@@ -1,7 +1,8 @@
-import { action, computed, makeObservable, observable } from "mobx";
+import { action, computed, makeObservable, observable, toJS } from "mobx";
 import { GamestateEnum } from "../enums/GameState";
 import { Player } from "../models/entities/Player";
 import { RoomSetting } from "../models/interface/RoomSetting";
+import * as _ from "lodash";
 class GameStore {
   private static _instance: GameStore | null;
 
@@ -12,13 +13,13 @@ class GameStore {
   private _settings: RoomSetting;
 
   @observable
-  private _players: Player[];
+  private _players: { [key: string]: Player };
 
   @observable
   private _roomId: string;
 
   @observable
-  private _me?: Player;
+  private _myId?: string;
 
   @action
   public setGameState(gameState: GamestateEnum) {
@@ -26,8 +27,8 @@ class GameStore {
   }
 
   @action
-  public setMe(player: Player) {
-    this._me = player;
+  public setMe(playerID: string) {
+    this._myId = playerID;
   }
 
   @action
@@ -35,9 +36,13 @@ class GameStore {
     this._settings = setting;
   }
 
+  @action addPlayer(player: Player) {
+    this._players[player.id] = player;
+  }
+
   @action
-  public setPlayers(players: Player[]) {
-    this._players = players;
+  public removePlayer(playerId: string) {
+    this._players = _.omit(this._players, playerId);
   }
 
   @action
@@ -52,7 +57,8 @@ class GameStore {
 
   @computed
   public get players(): Player[] {
-    return this._players;
+    const players = Object.values(this._players);
+    return players;
   }
 
   @computed
@@ -66,8 +72,16 @@ class GameStore {
   }
 
   @computed
+  public get myId(): string | undefined {
+    return this._myId;
+  }
+
+  public getPlayerById(playerId: string): Player {
+    return this._players[playerId];
+  }
+
   public get me(): Player | undefined {
-    return this._me;
+    return this._players[this._myId || ""];
   }
 
   private constructor() {
@@ -76,7 +90,7 @@ class GameStore {
       total_rounds: 4,
       round_time: 60,
     };
-    this._players = [];
+    this._players = {};
     this._roomId = "";
     makeObservable(this);
   }

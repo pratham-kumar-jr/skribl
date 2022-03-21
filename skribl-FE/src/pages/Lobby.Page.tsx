@@ -1,23 +1,22 @@
 import { observer } from "mobx-react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import Avator from "../components/Avator";
 import Button from "../components/Button";
 import DropDown from "../components/DropDown";
 import { UserRole } from "../models/entities/Player";
 import { gameService } from "../services/GameService";
-import { gameStore } from "../store/GameStore";
+import store from "../store"
 
 interface Props {}
 
 const LobbyPage: React.FC<Props> = (props) => {
-  const {players,roomId,me,setting} = gameStore
+  const {players,roomId,me,setting} = store.gameStore
 
   const disabled = me?.role === UserRole.JOINER;
-
   const roundOptions = Array(8)
     .fill(0)
     .map((_, index) => (
-      <option value={index + 3} key={`round_${index + 3}`}>
+      <option value={index + 3}>
         {index + 3}
       </option>
     ));
@@ -26,7 +25,7 @@ const LobbyPage: React.FC<Props> = (props) => {
     .fill(45)
     .map((n, index) => (
       <>
-        <option value={n + index * 15} key={`time_${n + index * 15}`}>
+        <option value={n + index * 15}>
           {n + index * 15}
         </option>
       </>
@@ -35,16 +34,17 @@ const LobbyPage: React.FC<Props> = (props) => {
   const handleStartGame = () => {};
 
   const handleRoundChange = (event: any) => {
-    setting.total_rounds = +event.target.value;
+    store.gameStore.setSetting({total_rounds:+event.target.value,round_time:setting.round_time})
   };
 
   const handleTimeChange = (event: any) => {
-    setting.round_time = +event.target.value;
+    store.gameStore.setSetting({round_time:+event.target.value,total_rounds:setting.total_rounds})
   };
 
 
   useEffect(()=>{
-    gameService.roomSyncClient(setting);
+    if(me && me.role === UserRole.CREATER)
+      gameService.roomSyncClient(setting);
   },[setting.round_time,setting.total_rounds,me?.role]);
 
   return (
@@ -75,7 +75,7 @@ const LobbyPage: React.FC<Props> = (props) => {
       </div>
       <div className="w-96 h-96 flex justify-around flex-wrap ">
         {players.map((player) => (
-          <Avator name={player.name}></Avator>
+          <Avator name={player.name} key={player.id}></Avator>
         ))}
       </div>
     </div>
