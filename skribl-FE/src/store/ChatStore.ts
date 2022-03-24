@@ -17,7 +17,7 @@ class ChatStore {
   }
 
   @computed
-  public get Chats(): Message[] {
+  public get chats(): Message[] {
     return this._chats;
   }
 

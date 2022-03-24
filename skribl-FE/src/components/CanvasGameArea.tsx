@@ -1,5 +1,7 @@
+import { observer } from "mobx-react";
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import { canvasService } from "../services/CanvasService";
+import store from "../store";
 import Button from "./Button";
 import Canvas from "./Canvas";
 
@@ -9,6 +11,9 @@ const CanvasGameArea: React.FC<Props> = (props) => {
   const [drawing, setDrawing] = useState(false);
   const [pencil, setPencil] = useState(0);
 
+  const {myId,currentPlayerId} = store.gameStore
+
+  const myChance = useMemo(()=>{return myId!==undefined &&  currentPlayerId === myId},[currentPlayerId,myId])
   const containerRef = useRef<HTMLDivElement>(null)
 
   const onDrawing = useCallback(
@@ -19,7 +24,7 @@ const CanvasGameArea: React.FC<Props> = (props) => {
       currentX: number,
       currentY: number
     ) => {
-      if (!context || !drawing) return;
+      if (!context || !drawing || !myChance) return;
       if(pencil === 0){
         canvasService.drawOnCanvas(startX, startY, currentX, currentY);
       }else if(pencil === 1){
@@ -37,22 +42,27 @@ const CanvasGameArea: React.FC<Props> = (props) => {
   );
 
   const startDrawing = useCallback(() => {
-    setDrawing(true);
-  }, []);
+    if(myChance)
+      setDrawing(true);
+  }, [myChance]);
 
   const endDrawing = useCallback(() => {
     setDrawing(false);
-  }, []);
+  }, [myChance]);
 
   const selectPencil = ()=>{
-    setPencil(0);
+    if(myChance)
+      setPencil(0);
   }
 
   const selectEraser = ()=>{
-    setPencil(1);
+    if(myChance)
+      setPencil(1);
   }
 
   const selectClear = ()=>{
+    if(!myChance)
+      return;
     canvasService.clearCanvas();
     canvasService.searlizeCanvas([2]);
     setPencil(0);
@@ -74,4 +84,4 @@ const CanvasGameArea: React.FC<Props> = (props) => {
 
 CanvasGameArea.defaultProps = {};
 
-export default React.memo(CanvasGameArea);
+export default observer(CanvasGameArea);

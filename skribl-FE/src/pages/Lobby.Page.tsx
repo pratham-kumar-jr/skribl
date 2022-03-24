@@ -31,7 +31,9 @@ const LobbyPage: React.FC<Props> = (props) => {
       </>
     ));
 
-  const handleStartGame = () => {};
+  const handleStartGame = () => {
+    gameService.startGameClient();
+  };
 
   const handleRoundChange = (event: any) => {
     store.gameStore.setSetting({total_rounds:+event.target.value,round_time:setting.round_time})

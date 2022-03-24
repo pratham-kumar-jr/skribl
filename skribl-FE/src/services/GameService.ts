@@ -1,5 +1,5 @@
 import { EventTypeEnum } from "../enums/EventTypeEnum";
-import { GamestateEnum } from "../enums/GameState";
+import { GameStateEnum } from "../enums/GameState";
 import { Player, UserRole } from "../models/entities/Player";
 import { RoomSetting } from "../models/interface/RoomSetting";
 import { roundService } from "./RoundService";
@@ -10,7 +10,7 @@ interface Response {
   player_status?: number;
   players: Player[];
   player?: Player;
-  game_state?: GamestateEnum;
+  game_state?: GameStateEnum;
   room_id?: string;
   settings?: RoomSetting;
   me?: string;
@@ -30,11 +30,6 @@ class GameService {
 
   public init() {
     webSocketService.init();
-
-    webSocketService.RegisterEvent(
-      EventTypeEnum.START_GAME,
-      this.startGameServer
-    );
 
     webSocketService.RegisterEvent(
       EventTypeEnum.ROOM_SYNC,
@@ -81,10 +76,9 @@ class GameService {
   }
 
   public startGameClient() {
-    webSocketService.EmitEvent(EventTypeEnum.START_GAME, {});
+    if (store.gameStore.players.length > 1)
+      webSocketService.EmitEvent(EventTypeEnum.START_GAME, {});
   }
-
-  public startGameServer(state: any) {}
 
   public endGameServer() {}
 }

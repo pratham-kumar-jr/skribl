@@ -1,5 +1,5 @@
 import { action, computed, makeObservable, observable, toJS } from "mobx";
-import { GamestateEnum } from "../enums/GameState";
+import { GameStateEnum } from "../enums/GameState";
 import { Player } from "../models/entities/Player";
 import { RoomSetting } from "../models/interface/RoomSetting";
 import * as _ from "lodash";
@@ -7,7 +7,7 @@ class GameStore {
   private static _instance: GameStore | null;
 
   @observable
-  private _gameState: GamestateEnum;
+  private _gameState: GameStateEnum;
 
   @observable
   private _settings: RoomSetting;
@@ -21,8 +21,76 @@ class GameStore {
   @observable
   private _myId?: string;
 
+  @observable
+  private _currentPlayerId?: string;
+
+  @observable
+  private _round: number;
+
+  @observable
+  private _choosing: boolean;
+
+  @observable
+  private _wordList: string[];
+
+  @observable
+  private _guessedPlayerId?: string;
+
+  @observable
+  private _timeLeft: number;
+
   @action
-  public setGameState(gameState: GamestateEnum) {
+  public setTimeLeft(timeLeft: number) {
+    this._timeLeft = timeLeft;
+  }
+
+  @computed
+  public get timeLeft(): number {
+    return this._timeLeft;
+  }
+
+  @action
+  public setGuessedPlayerId(playerId: string) {
+    this._guessedPlayerId;
+  }
+
+  @computed
+  public get guessedPlayerId(): string | undefined {
+    return this._guessedPlayerId;
+  }
+
+  @action
+  public setWordList(words: string[]) {
+    this._wordList = words;
+  }
+
+  @action
+  public setChoosing(state: boolean) {
+    this._choosing = state;
+  }
+
+  @computed
+  public get choosing(): boolean {
+    return this._choosing;
+  }
+
+  @action
+  public setCurrentPlayerId(playerId: string) {
+    this._currentPlayerId = playerId;
+  }
+
+  @computed
+  public get currentPlayerId(): string | undefined {
+    return this._currentPlayerId;
+  }
+
+  @computed
+  public get wordList(): string[] {
+    return this._wordList;
+  }
+
+  @action
+  public setGameState(gameState: GameStateEnum) {
     this._gameState = gameState;
   }
 
@@ -43,6 +111,16 @@ class GameStore {
   @action
   public removePlayer(playerId: string) {
     this._players = _.omit(this._players, playerId);
+  }
+
+  @action
+  public setRound(round: number) {
+    this._round = round;
+  }
+
+  @computed
+  public get round(): number {
+    return this._round;
   }
 
   @action
@@ -67,7 +145,7 @@ class GameStore {
   }
 
   @computed
-  public get gameState(): GamestateEnum {
+  public get gameState(): GameStateEnum {
     return this._gameState;
   }
 
@@ -84,14 +162,30 @@ class GameStore {
     return this._players[this._myId || ""];
   }
 
+  @action
+  public setScores(scores: { [playerId: string]: number }) {
+    this.players.forEach((p) => {
+      p.score = scores[p.id];
+    });
+  }
+
+  @action
+  public setScore(playerId: string, score: number) {
+    this._players[playerId].score = score;
+  }
+
   private constructor() {
-    this._gameState = GamestateEnum.NONE;
+    this._gameState = GameStateEnum.NONE;
     this._settings = {
       total_rounds: 4,
       round_time: 60,
     };
     this._players = {};
     this._roomId = "";
+    this._choosing = false;
+    this._round = 1;
+    this._timeLeft = this._settings.round_time;
+    this._wordList = [];
     makeObservable(this);
   }
 
