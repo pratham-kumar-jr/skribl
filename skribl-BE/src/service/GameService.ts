@@ -6,6 +6,7 @@ import { UserRoleEnum } from "../Enums/UserRoleEnum";
 import Player from "../model/Player";
 import Room, { RoomSetting } from "../model/Room";
 import { Helper } from "../utils/Helper";
+import { gameHelperService } from "./GameHelperService";
 import { mapService } from "./MapService";
 import { webSocketService } from "./WebSocketService";
 class GameService {
@@ -18,61 +19,6 @@ class GameService {
       GameService._instance = new GameService();
     }
     return GameService._instance;
-  }
-
-  private _validateSocket(socket: Socket): {
-    isValid: boolean;
-    player?: Player;
-    room?: Room;
-  } {
-    const player = mapService.getEntity<Player>(socket.id);
-    if (!player) {
-      console.log(`[Game Service] Player Does not exist.`);
-      webSocketService.sendPrivate(
-        socket,
-        EventTypeEnum.ERROR,
-        "Player Does not exist."
-      );
-      return { isValid: false };
-    }
-
-    if (player.role !== UserRoleEnum.CREATER) {
-      console.log(`[Game Service] Unauthorized Access.`);
-      webSocketService.sendPrivate(
-        socket,
-        EventTypeEnum.ERROR,
-        "Unauthorized Access."
-      );
-      return { isValid: false };
-    }
-
-    const room = mapService.getEntity<Room>(player.roomId || "");
-
-    if (!room) {
-      console.log(`[Game Service] Invalid Room Id`);
-      webSocketService.sendPrivate(
-        socket,
-        EventTypeEnum.ERROR,
-        "Invalid Room Id"
-      );
-      return { isValid: false };
-    }
-
-    if (!room.players.includes(player.id)) {
-      console.log(`[Game Service] Player Does not belongs to Room`);
-      webSocketService.sendPrivate(
-        socket,
-        EventTypeEnum.ERROR,
-        "Player Does not belongs to Room"
-      );
-      return { isValid: false };
-    }
-
-    return {
-      isValid: true,
-      player,
-      room,
-    };
   }
 
   public createGame(socket: Socket, payload: { name: string; id: string }) {
@@ -98,7 +44,7 @@ class GameService {
         role: UserRoleEnum.CREATER,
       },
       room_id: player.roomId,
-      game_state: "lobby",
+      game_state: GameStateEnum.LOBBY,
       player_status: 0,
       me: player.id,
     });
@@ -145,26 +91,33 @@ class GameService {
   }
 
   public changeGameSettings(socket: Socket, setting: RoomSetting) {
-    const { isValid, room } = this._validateSocket(socket);
+    const { player, room } = gameHelperService.getPlayerAndRoom(socket);
 
-    if (!isValid) {
+    if (!player || !room) {
       return;
     }
 
-    room!.update(setting);
+    room!.updateSetting(setting);
     webSocketService.sendToRoom(socket, EventTypeEnum.ROOM_SYNC, room!.id, {
       settings: room!.roomSetting,
     });
   }
 
   public draw(socket: Socket, commands: Array<Array<number>>) {
-    const { isValid, room } = this._validateSocket(socket);
+    const { player, room } = gameHelperService.getPlayerAndRoom(socket, false);
 
-    if (!isValid) {
+    if (!player || !room) {
       return;
     }
 
-    webSocketService.sendToRoom(socket, EventTypeEnum.DRAW, room!.id, commands);
+    if (room.players[room.currentPlayerIndex] === player.id) {
+      webSocketService.sendToRoom(
+        socket,
+        EventTypeEnum.DRAW,
+        room!.id,
+        commands
+      );
+    }
   }
 
   public leaveGame(socket: Socket) {
@@ -204,6 +157,108 @@ class GameService {
         player_status: 1,
         player: player.toJson(),
       });
+    }
+  }
+
+  public startGame(socket: Socket) {
+    const { player, room } = gameHelperService.getPlayerAndRoom(socket);
+    if (!player || !room) {
+      return;
+    }
+
+    const playerIds = room.players;
+
+    if (playerIds.length < 2) {
+      return;
+    }
+
+    const drawer = mapService.getEntity<Player>(
+      Helper.getRandom<string>(playerIds)
+    );
+
+    if (!drawer) {
+      return;
+    }
+
+    room.setCurrentPlayerIndex(room.players.indexOf(drawer.id));
+
+    webSocketService.sendToRoomByIO(EventTypeEnum.ROUND_SYNC, room.id, {
+      game_state: GameStateEnum.START,
+      scores: room.scores,
+      turn_player_id: drawer.id,
+      round: room.currentRound,
+      choosing: true,
+    });
+
+    webSocketService.sendToRoomByIO(EventTypeEnum.DRAW, room.id, {
+      commands: [[2]],
+    });
+
+    webSocketService.sendPrivate(drawer.mySocket, EventTypeEnum.ROUND_SYNC, {
+      word_list: Helper.getWordList(),
+    });
+  }
+
+  public async gameChat(socket: Socket, message: string) {
+    const { player, room } = gameHelperService.getPlayerAndRoom(socket, false);
+    if (!player || !room) {
+      return;
+    }
+
+    const drawerId = room.players[room.currentPlayerIndex];
+
+    if (drawerId === player.id) {
+      return;
+    }
+
+    if (room.checkGuessWord(message.trim())) {
+      if (room.isAlreadyGuessed(player.id)) {
+        return;
+      }
+
+      const curScore = room.scores[player.id];
+      const timeLeft = room.roomSetting.round_time - room.timeElapsed;
+      if (timeLeft > 0) {
+        room.changeScore(player.id, curScore + timeLeft * 50);
+        room.changeScore(drawerId, room.scores[drawerId] + timeLeft * 25);
+        room.markPlayerGuessed(player.id);
+        webSocketService.sendToRoomByIO(EventTypeEnum.ROUND_SYNC, room.id, {
+          scores: room.scores,
+          guessed_player_id: player.id,
+          time_left: timeLeft - 1,
+        });
+      } else {
+        webSocketService.sendToRoom(
+          socket,
+          EventTypeEnum.WORD_REVEAL,
+          room.id,
+          {
+            word: room.currentWord,
+          }
+        );
+      }
+    } else {
+      webSocketService.sendToRoom(socket, EventTypeEnum.CHAT, room.id, {
+        message: message,
+        id: player.id,
+      });
+    }
+  }
+
+  public async roundSync(socket: Socket, chosenWord?: string) {
+    const { player, room } = gameHelperService.getPlayerAndRoom(socket);
+
+    if (!player || !room) {
+      return;
+    }
+
+    if (chosenWord && chosenWord.trim() !== "") {
+      // setstarttime
+      // send all that choosing = false
+    } else {
+      // check round over
+      // if yes send all to sync them with next round
+      // send everyone to clear canvas
     }
   }
 }

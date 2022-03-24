@@ -15,6 +15,10 @@ class Player extends BaseSchema {
     mapService.setEntity<Player>(this.id, this);
   }
 
+  public get mySocket(): Socket {
+    return this._socket;
+  }
+
   public joinRoom(roomId: string) {
     this._roomId = roomId;
     this._socket.join(roomId);

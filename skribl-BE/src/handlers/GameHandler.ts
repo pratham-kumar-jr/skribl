@@ -38,10 +38,31 @@ const gameLeaveHandler = (socket: Socket) => {
   });
 };
 
+const gameChatHandler = (socket: Socket) => {
+  socket.on(EventTypeEnum.CHAT, (message: string) => {
+    gameService.gameChat(socket, message);
+  });
+};
+
+const gameRoundSyncHandler = (socket: Socket) => {
+  socket.on(EventTypeEnum.ROUND_SYNC, (data: { chosen_word?: string }) => {
+    gameService.roundSync(socket, data.chosen_word);
+  });
+};
+
+const gameStartHandler = (socket: Socket) => {
+  socket.on(EventTypeEnum.START_GAME, () => {
+    gameService.startGame(socket);
+  });
+};
+
 export default {
   gameCreateHandler,
   gameJoinHandler,
   gameRoomSyncHandler,
   drawHandler,
   gameLeaveHandler,
+  gameChatHandler,
+  gameRoundSyncHandler,
+  gameStartHandler,
 };

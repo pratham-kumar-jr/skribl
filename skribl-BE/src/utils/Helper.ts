@@ -40,4 +40,13 @@ export class Helper {
 
     return text;
   }
+
+  public static getRandom<T>(arr: T[]): T {
+    const randomIndex = Math.floor(Math.random() * arr.length);
+    return arr[randomIndex];
+  }
+
+  public static getWordList(): string[] {
+    return ["train", "car", "bus"];
+  }
 }

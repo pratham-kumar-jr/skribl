@@ -31,6 +31,9 @@ class WebSocketService {
       GameHandler.gameRoomSyncHandler(socket);
       GameHandler.drawHandler(socket);
       GameHandler.gameLeaveHandler(socket);
+      GameHandler.gameChatHandler(socket);
+      GameHandler.gameRoundSyncHandler(socket);
+      GameHandler.gameStartHandler(socket);
     });
   }
 
