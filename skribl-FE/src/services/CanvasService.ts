@@ -70,7 +70,7 @@ class CanvasService {
     this.batch.push(commands);
     if (!this.isRequestTimed) {
       setTimeout(() => {
-        roundService.onDrawClient(this.batch);
+        roundService.drawClient(this.batch);
         this.isRequestTimed = false;
         this.batch = [];
       }, this.batchTime);

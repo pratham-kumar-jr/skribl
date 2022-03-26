@@ -1,20 +1,28 @@
-import React from "react";
+import React, { useMemo } from "react";
 
 interface Props {
   children: string;
   onClick?: (event: any) => void;
   className?: string;
   type?: "button" | "submit";
-  disabled?:boolean
+  disabled?: boolean;
+  icon?: boolean;
 }
 
 const Button: React.FC<Props> = (props) => {
+  const normalButtonClass = useMemo(
+    () => `border-2 border-black text-xl p-2 rounded-md 
+  text-center w-40 shadow-lg hover:scale-110 hover:text-2xl h-12  
+  disabled:opacity-60 ${props.className} `,
+    []
+  );
+
+  const iconButtonClass = useMemo(()=>`w-12 h-12 border-2 border-black rounded-full pt-1 pl-1 ${props.className} `,[])
+
   return (
     <button
       type={props.type}
-      className={`border-2 border-x-blue-400 border-opacity-80 
-                border-y-pink-400 p-2 rounded-md 
-                text-center w-40 shadow-md hover:text-lg h-12  disabled:opacity-60 ${props.className}`}
+      className={props.icon? iconButtonClass:normalButtonClass}
       onClick={props.onClick}
       disabled={props.disabled}
     >
@@ -25,6 +33,7 @@ const Button: React.FC<Props> = (props) => {
 
 Button.defaultProps = {
   type: "button",
+  icon: false,
 };
 
 export default React.memo(Button);

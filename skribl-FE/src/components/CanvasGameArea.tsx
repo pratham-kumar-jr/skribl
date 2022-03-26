@@ -1,5 +1,5 @@
 import { observer } from "mobx-react";
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import { canvasService } from "../services/CanvasService";
 import store from "../store";
 import Button from "./Button";
@@ -11,9 +11,8 @@ const CanvasGameArea: React.FC<Props> = (props) => {
   const [drawing, setDrawing] = useState(false);
   const [pencil, setPencil] = useState(0);
 
-  const {myId,currentPlayerId} = store.gameStore
+  const {myChance,choosing} = store.gameStore
 
-  const myChance = useMemo(()=>{return myId!==undefined &&  currentPlayerId === myId},[currentPlayerId,myId])
   const containerRef = useRef<HTMLDivElement>(null)
 
   const onDrawing = useCallback(
@@ -42,26 +41,26 @@ const CanvasGameArea: React.FC<Props> = (props) => {
   );
 
   const startDrawing = useCallback(() => {
-    if(myChance)
+    if(myChance && !choosing)
       setDrawing(true);
-  }, [myChance]);
+  }, [myChance,choosing]);
 
   const endDrawing = useCallback(() => {
     setDrawing(false);
-  }, [myChance]);
+  }, [myChance,choosing]);
 
   const selectPencil = ()=>{
-    if(myChance)
+    if(myChance && !choosing)
       setPencil(0);
   }
 
   const selectEraser = ()=>{
-    if(myChance)
+    if(myChance && !choosing)
       setPencil(1);
   }
 
   const selectClear = ()=>{
-    if(!myChance)
+    if(!myChance && !choosing)
       return;
     canvasService.clearCanvas();
     canvasService.searlizeCanvas([2]);
@@ -70,13 +69,13 @@ const CanvasGameArea: React.FC<Props> = (props) => {
 
   return (
     <>
-    <div className="bg-blue-200 w-full h-full border border-black" ref={containerRef}>
+    <div className="bg-blue-200 w-full h-full border-2 border-black rounded-md " ref={containerRef}>
       <Canvas onDraw={onDrawing} onStart={startDrawing} onStop={endDrawing} className="bg-white w-full h-full" />
     </div>
-    <div className="mt-4 flex justify-between">
-      <Button onClick={selectPencil}>Pencil</Button>
-      <Button onClick={selectEraser}>Eraser</Button>
-      <Button onClick={selectClear}>Clear</Button>
+    <div className="mt-4 flex justify-center space-x-4">
+      <Button icon={true} onClick={selectPencil}>P</Button>
+      <Button icon={true} onClick={selectEraser}>E</Button>
+      <Button icon={true} onClick={selectClear}>C</Button>
     </div>
     </>
   );

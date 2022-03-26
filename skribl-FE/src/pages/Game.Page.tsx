@@ -1,27 +1,26 @@
-import { observer } from "mobx-react";
 import React from "react";
 import CanvasGameArea from "../components/CanvasGameArea";
-import List from "../components/List";
-import store  from "../store"
+import ChatArea from "../components/ChatArea";
+import GameInfoArea from "../components/GameInfoArea";
 
 interface Props {}
 
 const GamePage: React.FC<Props> = (props) => {
-
-  const {players} =  store.gameStore
-  // const {chats} = store.chatStore
-
   return (
-    <div className="flex space-x-4 px-16 h-screen border-4 border-white">
-      <List className="w-1/4 bg-white  h-3/4 " title='Players' element={players}></List>
-      <div className="w-1/2 bg-blue-300 h-3/4 p-2 border border-black">
+    <div className="h-full w-full border border-black p-4 flex space-x-2">
+      <div className=" w-1/4 p-2 h-4/6">
+        <GameInfoArea />
+      </div>
+      <div className="w-1/2 p-2 h-4/6">
         <CanvasGameArea />
       </div>
-      {/* <List className="w-1/4 bg-white  h-3/4 " title='Chat' element={chats}></List> */}
+      <div className="w-1/4 p-2 h-4/6">
+        <ChatArea/>  
+      </div>
     </div>
   );
 };
 
 GamePage.defaultProps = {};
 
-export default observer(GamePage);
+export default React.memo(GamePage);

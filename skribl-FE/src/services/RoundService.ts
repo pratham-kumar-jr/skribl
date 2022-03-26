@@ -1,6 +1,8 @@
 import { EventTypeEnum } from "../enums/EventTypeEnum";
 import { GameStateEnum } from "../enums/GameState";
 import store from "../store";
+import { chatStore } from "../store/ChatStore";
+import { gameStore } from "../store/GameStore";
 import { canvasService } from "./CanvasService";
 import { webSocketService } from "./WebSocketService";
 
@@ -27,35 +29,37 @@ class RoundService {
   }
 
   public init() {
-    webSocketService.RegisterEvent(EventTypeEnum.CHAT, this.onChatServer);
-    webSocketService.RegisterEvent(EventTypeEnum.DRAW, this.onDrawServer);
+    webSocketService.RegisterEvent(EventTypeEnum.CHAT, this.chatServer);
+    webSocketService.RegisterEvent(EventTypeEnum.DRAW, this.drawServer);
     webSocketService.RegisterEvent(
       EventTypeEnum.WORD_REVEAL,
-      this.onWordRevealServer
+      this.wordRevealServer
     );
     webSocketService.RegisterEvent(
       EventTypeEnum.ROUND_SYNC,
-      this.onRoundSyncServer
+      this.roundSyncServer
     );
     console.log("[Round Service] Intialized");
   }
 
-  // message
-  public onChatClient() {}
+  public chatClient(message: string) {
+    webSocketService.EmitEvent(EventTypeEnum.CHAT, { message });
+  }
 
-  public onDrawClient(commands: Array<Array<number>>) {
+  public drawClient(commands: Array<Array<number>>) {
     if (store.gameStore.currentPlayerId === store.gameStore.myId)
       webSocketService.EmitEvent(EventTypeEnum.DRAW, { commands });
   }
 
-  // message if(not correct )else playerId guessed
-  public onChatServer() {}
+  public chatServer(data: { message: string; id: string }) {
+    const player = gameStore.getPlayerById(data.id);
+    chatStore.addChat({ message: data.message, by: player.name });
+  }
 
   //word
-  public onWordRevealServer() {}
+  public wordRevealServer() {}
 
-  //gameState?,turnplayerId,currentRole, if currentRole === drawer array of words,syncTimer,round,score with playerId
-  public onRoundSyncServer(state: RoundSyncResponse) {
+  public roundSyncServer(state: RoundSyncResponse) {
     if (state.game_state) {
       store.gameStore.setGameState(state.game_state as GameStateEnum);
     }
@@ -72,7 +76,7 @@ class RoundService {
       store.gameStore.setRound(state.round);
     }
 
-    if (state.choosing) {
+    if (state.choosing !== undefined) {
       store.gameStore.setChoosing(state.choosing);
     }
 
@@ -80,15 +84,20 @@ class RoundService {
       store.gameStore.setWordList(state.word_list);
     }
 
-    if (state.time_left) {
+    if (state.time_left !== undefined) {
       store.gameStore.setTimeLeft(state.time_left);
     }
   }
 
-  //chooseWord,call after wordReveal
-  public onRoundSyncClient() {}
+  public roundSyncClient(word?: string) {
+    if (store.gameStore.myChance) {
+      webSocketService.EmitEvent(EventTypeEnum.ROUND_SYNC, {
+        chosen_word: word,
+      });
+    }
+  }
 
-  public onDrawServer({ commands }: { commands: Array<Array<number>> }) {
+  public drawServer({ commands }: { commands: Array<Array<number>> }) {
     for (const command of commands) {
       if (command[0] === 1) {
         canvasService.eraseOnCanvas(command[1], command[2]);

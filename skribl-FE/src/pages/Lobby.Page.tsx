@@ -1,33 +1,27 @@
 import { observer } from "mobx-react";
 import React, { useEffect } from "react";
-import Avator from "../components/Avator";
 import Button from "../components/Button";
 import DropDown from "../components/DropDown";
+import Header from "../components/Header";
 import { UserRole } from "../models/entities/Player";
 import { gameService } from "../services/GameService";
-import store from "../store"
+import store from "../store";
 
 interface Props {}
 
 const LobbyPage: React.FC<Props> = (props) => {
-  const {players,roomId,me,setting} = store.gameStore
+  const {  roomId, me, setting } = store.gameStore;
 
   const disabled = me?.role === UserRole.JOINER;
   const roundOptions = Array(8)
     .fill(0)
-    .map((_, index) => (
-      <option value={index + 3}>
-        {index + 3}
-      </option>
-    ));
+    .map((_, index) => <option value={index + 3}>{index + 3}</option>);
 
   const timeOptions = Array(8)
     .fill(45)
     .map((n, index) => (
       <>
-        <option value={n + index * 15}>
-          {n + index * 15}
-        </option>
+        <option value={n + index * 15}>{n + index * 15}</option>
       </>
     ));
 
@@ -36,23 +30,29 @@ const LobbyPage: React.FC<Props> = (props) => {
   };
 
   const handleRoundChange = (event: any) => {
-    store.gameStore.setSetting({total_rounds:+event.target.value,round_time:setting.round_time})
+    store.gameStore.setSetting({
+      total_rounds: +event.target.value,
+      round_time: setting.round_time,
+    });
   };
 
   const handleTimeChange = (event: any) => {
-    store.gameStore.setSetting({round_time:+event.target.value,total_rounds:setting.total_rounds})
+    store.gameStore.setSetting({
+      round_time: +event.target.value,
+      total_rounds: setting.total_rounds,
+    });
   };
 
-
-  useEffect(()=>{
-    if(me && me.role === UserRole.CREATER)
-      gameService.roomSyncClient(setting);
-  },[setting.round_time,setting.total_rounds,me?.role]);
+  useEffect(() => {
+    if (me && me.role === UserRole.CREATER) gameService.roomSyncClient(setting);
+  }, [setting.round_time, setting.total_rounds, me?.role]);
 
   return (
-    <div className="m-2 flex flex-row justify-around items-center">
-      <div className=" w-96 flex flex-col">
-        <h1 className="text-center text-2xl font-medium">Settings</h1>
+   <>
+   <div className="lg:w-4/5 lg:h-3/5 xl:h-3/5 xl:w-2/5 lg:mx-auto 
+    lg:pt-1/20 xl:pt-1/50 flex  lg:border flex-col justify-start items-center 
+   space-y-4 pt-1/3 md:pt-1/8 lg:shadow-lg rounded-md lg:border-black ">
+     <Header className=" mt-1/20">Skribble</Header>
         <DropDown
           id="rounds"
           title="No Of Rounds :"
@@ -71,16 +71,10 @@ const LobbyPage: React.FC<Props> = (props) => {
         >
           {timeOptions}
         </DropDown>
-
-        <Button className="mx-auto my-2 " onClick={handleStartGame} disabled={disabled}> Start Game</Button>
-        <h2 className=" mt-2 px-4 text-lg font-medium">Invite Link : {roomId} </h2>
+        <Button disabled={disabled} onClick={handleStartGame}>Start</Button>
+        <h2 className=" mt-2 px-4 text-lg font-medium">Invite Link : <a href={`/?${roomId}`} target={"_blank"} className=" text-blue-400">{roomId}</a> </h2>
       </div>
-      <div className="w-96 h-96 flex justify-around flex-wrap ">
-        {players.map((player) => (
-          <Avator name={player.name} key={player.id}></Avator>
-        ))}
-      </div>
-    </div>
+   </>
   );
 };
 

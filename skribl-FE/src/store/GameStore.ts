@@ -174,6 +174,14 @@ class GameStore {
     this._players[playerId].score = score;
   }
 
+  @computed
+  public get topScorers(): Player[] {
+    const tops = this.players.sort((p1, p2) =>
+      p1 < p2 ? 1 : p1 == p2 ? 0 : -1
+    );
+    return tops;
+  }
+
   private constructor() {
     this._gameState = GameStateEnum.NONE;
     this._settings = {
@@ -187,6 +195,11 @@ class GameStore {
     this._timeLeft = this._settings.round_time;
     this._wordList = [];
     makeObservable(this);
+  }
+
+  @computed
+  public get myChance(): boolean {
+    return this._myId !== undefined && this._currentPlayerId === this.myId;
   }
 
   public static getInstance(): GameStore {
