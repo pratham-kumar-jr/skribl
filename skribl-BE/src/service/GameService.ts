@@ -62,6 +62,7 @@ class GameService {
       return;
     }
 
+    // TODO: check if game is in running state
     const player = room.addPlayer(socket, {
       id: socket.id,
       name: payload.name,
@@ -145,7 +146,6 @@ class GameService {
     } else {
       if (player.role === UserRoleEnum.CREATER) {
         // TODO: Handle In Game Leave
-        // promote next player to creater
         const nextPlayer = mapService.getEntity<Player>(room.players[0]);
         nextPlayer?.update(UserRoleEnum.CREATER);
         webSocketService.sendToRoomByIO(EventTypeEnum.ROOM_SYNC, room.id, {
@@ -181,6 +181,7 @@ class GameService {
     }
 
     room.setCurrentPlayerIndex(room.players.indexOf(drawer.id));
+    room.resetScore();
 
     webSocketService.sendToRoomByIO(EventTypeEnum.ROUND_SYNC, room.id, {
       game_state: GameStateEnum.START,
@@ -211,7 +212,7 @@ class GameService {
       return;
     }
 
-    if (room.checkGuessWord(message.trim())) {
+    if (room.checkGuessWord(message.trim() || "")) {
       if (room.isAlreadyGuessed(player.id)) {
         return;
       }
@@ -246,19 +247,36 @@ class GameService {
   }
 
   public async roundSync(socket: Socket, chosenWord?: string) {
-    const { player, room } = gameHelperService.getPlayerAndRoom(socket);
+    const { player, room } = gameHelperService.getPlayerAndRoom(socket, false);
 
     if (!player || !room) {
       return;
     }
 
     if (chosenWord && chosenWord.trim() !== "") {
-      // setstarttime
-      // send all that choosing = false
+      room.setCurrenWord(chosenWord);
+      room.startRound();
+      webSocketService.sendToRoomByIO(EventTypeEnum.ROUND_SYNC, room.id, {
+        choosing: false,
+        round_start: true,
+      });
     } else {
-      // check round over
-      // if yes send all to sync them with next round
-      // send everyone to clear canvas
+      if (room.isFinalOver()) {
+        // TODO: change game state to end and send final socres
+      } else if (room.timeElapsed <= 0) {
+        room.updateCurrentRound();
+        room.updateToNextPlayer();
+        const nextPlayerId = room.players[room.currentPlayerIndex];
+        webSocketService.sendToRoomByIO(EventTypeEnum.ROUND_SYNC, room.id, {
+          scores: room.scores,
+          turn_player_id: nextPlayerId,
+          round: room.currentRound,
+          choosing: true,
+        });
+        webSocketService.sendToRoomByIO(EventTypeEnum.DRAW, room.id, {
+          commands: [[2]],
+        });
+      }
     }
   }
 }

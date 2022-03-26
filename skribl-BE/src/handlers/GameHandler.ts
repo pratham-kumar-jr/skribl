@@ -39,8 +39,8 @@ const gameLeaveHandler = (socket: Socket) => {
 };
 
 const gameChatHandler = (socket: Socket) => {
-  socket.on(EventTypeEnum.CHAT, (message: string) => {
-    gameService.gameChat(socket, message);
+  socket.on(EventTypeEnum.CHAT, (data: { message: string }) => {
+    gameService.gameChat(socket, data.message);
   });
 };
 

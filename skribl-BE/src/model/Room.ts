@@ -31,10 +31,15 @@ class Room extends BaseSchema {
     mapService.setEntity<Room>(this.id, this);
   }
 
+  public resetScore() {
+    for (const playerId of this.players) {
+      this._scores[playerId] = 0;
+    }
+    mapService.setEntity<Room>(this.id, this);
+  }
+
   public updateCurrentRound() {
     this._curentRound++;
-    this._roundStartTime = moment.now();
-    this._guessedPlayer = [];
     mapService.setEntity<Room>(this.id, this);
   }
 
@@ -133,6 +138,12 @@ class Room extends BaseSchema {
     this._scores = _.omit(this._scores, this._players[pos]);
     this._players[pos] = this._players[this._players.length - 1];
     this._players.pop();
+    mapService.setEntity<Room>(this.id, this);
+  }
+
+  public startRound() {
+    this._roundStartTime = moment.now();
+    this._guessedPlayer = [];
     mapService.setEntity<Room>(this.id, this);
   }
 }
