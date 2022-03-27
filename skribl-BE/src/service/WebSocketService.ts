@@ -34,6 +34,7 @@ class WebSocketService {
       GameHandler.gameChatHandler(socket);
       GameHandler.gameRoundSyncHandler(socket);
       GameHandler.gameStartHandler(socket);
+      GameHandler.gameWordRevealHandler(socket);
     });
   }
 

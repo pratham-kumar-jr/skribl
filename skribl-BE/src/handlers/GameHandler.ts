@@ -3,6 +3,7 @@ import { PlayerDTO } from "../DTOs/PlayerDTO";
 import { EventTypeEnum } from "../Enums/EvenTypeEnum";
 import { RoomSetting } from "../model/Room";
 import { gameService } from "../service/GameService";
+import { roundService } from "../service/RoundService";
 
 const gameCreateHandler = (socket: Socket) => {
   socket.on(EventTypeEnum.CREATE_GAME, ({ player }: { player: PlayerDTO }) => {
@@ -20,9 +21,17 @@ const gameJoinHandler = (socket: Socket) => {
 };
 
 const gameRoomSyncHandler = (socket: Socket) => {
-  socket.on(EventTypeEnum.ROOM_SYNC, (settings: RoomSetting) => {
-    gameService.changeGameSettings(socket, settings);
-  });
+  socket.on(
+    EventTypeEnum.ROOM_SYNC,
+    (data: { new_game?: boolean; settings?: RoomSetting }) => {
+      if (data.settings) {
+        gameService.changeGameSettings(socket, data.settings);
+      }
+      if (data.new_game) {
+        gameService.reGame(socket);
+      }
+    }
+  );
 };
 
 const drawHandler = (socket: Socket) => {
@@ -40,19 +49,25 @@ const gameLeaveHandler = (socket: Socket) => {
 
 const gameChatHandler = (socket: Socket) => {
   socket.on(EventTypeEnum.CHAT, (data: { message: string }) => {
-    gameService.gameChat(socket, data.message);
+    roundService.gameChat(socket, data.message);
   });
 };
 
 const gameRoundSyncHandler = (socket: Socket) => {
   socket.on(EventTypeEnum.ROUND_SYNC, (data: { chosen_word?: string }) => {
-    gameService.roundSync(socket, data.chosen_word);
+    roundService.roundSync(socket, data.chosen_word);
   });
 };
 
 const gameStartHandler = (socket: Socket) => {
   socket.on(EventTypeEnum.START_GAME, () => {
     gameService.startGame(socket);
+  });
+};
+
+const gameWordRevealHandler = (socket: Socket) => {
+  socket.on(EventTypeEnum.WORD_REVEAL, () => {
+    roundService.wordReveal(socket);
   });
 };
 
@@ -65,4 +80,5 @@ export default {
   gameChatHandler,
   gameRoundSyncHandler,
   gameStartHandler,
+  gameWordRevealHandler,
 };

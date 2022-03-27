@@ -38,17 +38,21 @@ class Room extends BaseSchema {
     mapService.setEntity<Room>(this.id, this);
   }
 
-  public updateCurrentRound() {
-    this._curentRound++;
+  public getGuessPlayerCount(): number {
+    return this._guessedPlayer.length;
+  }
+
+  public updateCurrentRound(round: number) {
+    this._curentRound = round;
     mapService.setEntity<Room>(this.id, this);
   }
 
   public isFinalOver(): boolean {
-    return this._curentRound > this._roomSetting.total_rounds;
+    return this._curentRound >= this._roomSetting.total_rounds;
   }
 
   public get timeElapsed(): number {
-    return moment.now() - this._roundStartTime;
+    return Math.floor((moment.now() - this._roundStartTime) / 1000);
   }
 
   public isAlreadyGuessed(playerId: string): boolean {
@@ -141,7 +145,7 @@ class Room extends BaseSchema {
     mapService.setEntity<Room>(this.id, this);
   }
 
-  public startRound() {
+  public resetRound() {
     this._roundStartTime = moment.now();
     this._guessedPlayer = [];
     mapService.setEntity<Room>(this.id, this);
