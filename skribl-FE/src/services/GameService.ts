@@ -1,6 +1,6 @@
 import { EventTypeEnum } from "../enums/EventTypeEnum";
 import { GameStateEnum } from "../enums/GameState";
-import { Player, UserRole } from "../models/entities/Player";
+import { Player } from "../models/entities/Player";
 import { RoomSetting } from "../models/interface/RoomSetting";
 import { roundService } from "./RoundService";
 import { webSocketService } from "./WebSocketService";
@@ -14,6 +14,11 @@ interface Response {
   room_id?: string;
   settings?: RoomSetting;
   me?: string;
+}
+
+interface RoomSyncRequest {
+  settings?: RoomSetting;
+  new_game?: boolean;
 }
 
 class GameService {
@@ -49,8 +54,8 @@ class GameService {
     webSocketService.EmitEvent(EventTypeEnum.JOIN_GAME, { roomId, player });
   }
 
-  public roomSyncClient(settings: RoomSetting) {
-    webSocketService.EmitEvent(EventTypeEnum.ROOM_SYNC, settings);
+  public roomSyncClient(data: RoomSyncRequest) {
+    webSocketService.EmitEvent(EventTypeEnum.ROOM_SYNC, data);
   }
 
   public roomSyncServer(res: Response) {
@@ -80,7 +85,13 @@ class GameService {
       webSocketService.EmitEvent(EventTypeEnum.START_GAME, {});
   }
 
-  public endGameServer() {}
+  public endGameServer(data: {
+    game_state: string;
+    scores: { [key: string]: number };
+  }) {
+    store.gameStore.setGameState(data.game_state as GameStateEnum);
+    store.gameStore.setScores(data.scores);
+  }
 }
 
 export const gameService = GameService.getInstance();

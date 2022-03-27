@@ -44,7 +44,7 @@ const LobbyPage: React.FC<Props> = (props) => {
   };
 
   useEffect(() => {
-    if (me && me.role === UserRole.CREATER) gameService.roomSyncClient(setting);
+    if (me && me.role === UserRole.CREATER) gameService.roomSyncClient({settings:setting});
   }, [setting.round_time, setting.total_rounds, me?.role]);
 
   return (

@@ -1,4 +1,4 @@
-import { action, computed, makeObservable, observable, toJS } from "mobx";
+import { action, computed, makeObservable, observable } from "mobx";
 import { GameStateEnum } from "../enums/GameState";
 import { Player } from "../models/entities/Player";
 import { RoomSetting } from "../models/interface/RoomSetting";
@@ -8,6 +8,9 @@ class GameStore {
 
   @observable
   private _gameState: GameStateEnum;
+
+  @observable
+  private _currentWord: string | undefined;
 
   @observable
   private _settings: RoomSetting;
@@ -39,6 +42,9 @@ class GameStore {
   @observable
   private _timeLeft: number;
 
+  @observable
+  private _roundStart: boolean;
+
   @action
   public setTimeLeft(timeLeft: number) {
     this._timeLeft = timeLeft;
@@ -49,9 +55,14 @@ class GameStore {
     return this._timeLeft;
   }
 
+  @computed
+  public get roundStart(): boolean {
+    return this._roundStart;
+  }
+
   @action
   public setGuessedPlayerId(playerId: string) {
-    this._guessedPlayerId;
+    this._guessedPlayerId = playerId;
   }
 
   @computed
@@ -79,6 +90,16 @@ class GameStore {
     this._currentPlayerId = playerId;
   }
 
+  @action
+  public setCurrentWord(word?: string) {
+    this._currentWord = word;
+  }
+
+  @computed
+  public get currentWord(): string | undefined {
+    return this._currentWord;
+  }
+
   @computed
   public get currentPlayerId(): string | undefined {
     return this._currentPlayerId;
@@ -92,6 +113,11 @@ class GameStore {
   @action
   public setGameState(gameState: GameStateEnum) {
     this._gameState = gameState;
+  }
+
+  @action
+  public setRoundStart(roundStart: boolean) {
+    this._roundStart = roundStart;
   }
 
   @action
@@ -158,6 +184,7 @@ class GameStore {
     return this._players[playerId];
   }
 
+  @computed
   public get me(): Player | undefined {
     return this._players[this._myId || ""];
   }
@@ -174,10 +201,9 @@ class GameStore {
     this._players[playerId].score = score;
   }
 
-  @computed
   public get topScorers(): Player[] {
     const tops = this.players.sort((p1, p2) =>
-      p1 < p2 ? 1 : p1 == p2 ? 0 : -1
+      p1.score < p2.score ? 1 : p1.score == p2.score ? 0 : -1
     );
     return tops;
   }
@@ -194,6 +220,7 @@ class GameStore {
     this._round = 1;
     this._timeLeft = this._settings.round_time;
     this._wordList = [];
+    this._roundStart = false;
     makeObservable(this);
   }
 

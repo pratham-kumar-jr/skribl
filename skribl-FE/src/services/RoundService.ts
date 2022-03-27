@@ -15,6 +15,8 @@ interface RoundSyncResponse {
   word_list?: string[];
   guessed_player_id: string;
   time_left: number;
+  round_start?: boolean;
+  round_change?: boolean;
 }
 class RoundService {
   private static _instance: RoundService | null;
@@ -56,8 +58,16 @@ class RoundService {
     chatStore.addChat({ message: data.message, by: player.name });
   }
 
-  //word
-  public wordRevealServer() {}
+  public wordRevealServer(data: { word: string }) {
+    store.gameStore.setCurrentWord(data.word);
+  }
+
+  public wordRevealClient() {
+    console.log("word reveal after timer ends");
+    if (store.gameStore.myChance) {
+      webSocketService.EmitEvent(EventTypeEnum.WORD_REVEAL, {});
+    }
+  }
 
   public roundSyncServer(state: RoundSyncResponse) {
     if (state.game_state) {
@@ -77,6 +87,9 @@ class RoundService {
     }
 
     if (state.choosing !== undefined) {
+      if (state.choosing) {
+        store.gameStore.setCurrentWord(undefined);
+      }
       store.gameStore.setChoosing(state.choosing);
     }
 
@@ -86,6 +99,10 @@ class RoundService {
 
     if (state.time_left !== undefined) {
       store.gameStore.setTimeLeft(state.time_left);
+    }
+
+    if (state.round_start !== undefined) {
+      store.gameStore.setRoundStart(state.round_start);
     }
   }
 

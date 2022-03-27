@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import Players from "./components/Players";
 import { GameStateEnum } from "./enums/GameState";
 import GamePage from "./pages/Game.Page";
+import GameOverPage from "./pages/GameOver.Page";
 import LobbyPage from "./pages/Lobby.Page";
 import MainPage from "./pages/Main.Page";
 import { gameStore } from "./store/GameStore";
@@ -27,9 +28,9 @@ const App: React.FC<Props> = (props) => {
           <MainPage roomId={roomId}></MainPage>
         ) : (
           <>
-            {gameState === GameStateEnum.LOBBY && <LobbyPage></LobbyPage>}
-            {gameState === GameStateEnum.START && <GamePage></GamePage>}
-            {/* {(gameState === GamestateEnum.END) && <GameOverPage></GameOverPage>} */}
+            {gameState === GameStateEnum.LOBBY && <LobbyPage/>}
+            {gameState === GameStateEnum.START && <GamePage/>}
+            {(gameState === GameStateEnum.END) && <GameOverPage/>}
             <Players />
           </>
         )}

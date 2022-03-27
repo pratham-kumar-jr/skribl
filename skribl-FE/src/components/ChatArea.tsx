@@ -31,8 +31,8 @@ const ChatArea: React.FC<Props> = (props) => {
       <div className="h-9/10 p-4">
         <div className="text-xl h-full tracking-wider overflow-y-auto">
           {chats.map((chat) => (
-            <p className="my-1 bg-slate-400 p-2 rounded-md opacity-75" key={chat.by+chat.message}>
-              <span className=" text-green-800 mr-2 break-normal">
+            <p className="my-1 bg-gray-200 p-2 rounded-md opacity-75" key={chat.by+chat.message}>
+              <span className=" text-green-700 mr-2 break-normal">
                 {chat.by}
               </span>
               {chat.message}

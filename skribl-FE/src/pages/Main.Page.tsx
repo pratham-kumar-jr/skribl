@@ -58,7 +58,7 @@ const MainPage: React.FC<Props> = ({ roomId }) => {
       <div className="xl:w-2/6 lg:w-2/5 p-2 h-4/6 lg:h-full">
         <Header className="mx-auto lg:hidden">Skribble</Header>
         <h2 className="text-center my-2 text-xl">Draw your Avator</h2>
-        <div className=" border-2 p-2 h-5/6 border-black rounded-md">
+        <div className=" border-2 p-2 h-4/6 lg:h-5/6 border-black rounded-md">
           <div className="m-1 border-2  border-black w-full md:w-1/2 mx-auto h-4/6 lg:w-full lg:h-3/5 rounded-md">
             Canvas
           </div>
@@ -80,11 +80,13 @@ const MainPage: React.FC<Props> = ({ roomId }) => {
           </div>
         </div>
       </div>
-      <div className="lg:w-4/6 p-2 relative">
+      <div className="lg:w-4/6 h-2/6 lg:h-full  p-2 relative">
         {breakPoint !== "md" && breakPoint !== "sm" && breakPoint !== "lg" && (
           <Header className="mx-auto">Skribble</Header>
         )}
-        <Button onClick={handlePlay} className="mt-6 ml-4">Play</Button>
+        <div className="lg:mt-6 mx-auto max-w-max lg:ml-4">
+        <Button onClick={handlePlay}>Play</Button>
+        </div>
         <Button icon={true} className={`absolute bottom-3 right-3`}>
           Help
         </Button>
