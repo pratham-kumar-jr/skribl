@@ -5,8 +5,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview",
-    "start": ""
+    "start": "vite preview"
   },
   "dependencies": {
     "lodash": "^4.17.21",
