@@ -37,10 +37,17 @@ class CanvasService {
     const context = canvas.getContext("2d");
     if (!context) return;
 
+    startX *= canvas.width;
+    startY *= canvas.height;
+
+    currentX *= canvas.width;
+    currentY *= canvas.height;
+
     context.beginPath();
     context.moveTo(startX, startY);
     context.lineTo(currentX, currentY);
     context.fillStyle = "black";
+    context.lineWidth = 3;
     context.stroke();
   }
 
@@ -50,8 +57,8 @@ class CanvasService {
 
     const context = canvas.getContext("2d");
     if (!context) return;
-    const width = canvas.clientWidth;
-    const height = canvas.clientHeight;
+    const width = canvas.width;
+    const height = canvas.height;
     context.clearRect(0, 0, width, height);
   }
 
@@ -61,6 +68,9 @@ class CanvasService {
 
     const context = canvas.getContext("2d");
     if (!context) return;
+
+    currentX *= canvas.width;
+    currentY *= canvas.height;
 
     context.fillStyle = "white";
     context.fillRect(currentX, currentY, size, size);
@@ -76,6 +86,10 @@ class CanvasService {
       }, this.batchTime);
     }
     this.isRequestTimed = true;
+  }
+
+  public canvasToUrl(): string | undefined {
+    return canvasStore.Canvas?.toDataURL();
   }
 }
 

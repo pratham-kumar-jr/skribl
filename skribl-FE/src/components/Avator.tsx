@@ -14,7 +14,6 @@ const Avator: React.FC<Props> = ({ name, src,score,id,pos }) => {
   const {gameState,myId} = store.gameStore;
   
   const myAvator = useMemo(()=>{return myId === id},[myId]);
-  console.log(pos);
 
   const posClass = pos === 1? 'text-orange-500 scale-110':
                   pos === 2?'text-blue-500 scale-105':

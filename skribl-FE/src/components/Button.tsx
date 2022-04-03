@@ -17,7 +17,7 @@ const Button: React.FC<Props> = (props) => {
     []
   );
 
-  const iconButtonClass = useMemo(()=>`w-12 h-12 border-2 border-black rounded-full pt-1 pl-1 ${props.className} `,[])
+  const iconButtonClass = useMemo(()=>`w-10 h-10 border-2 border-black rounded-full pt-1 pl-1 ${props.className} `,[])
 
   return (
     <button

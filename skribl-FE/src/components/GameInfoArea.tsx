@@ -1,104 +1,70 @@
 import { observer } from "mobx-react";
 import React, { useMemo } from "react";
-import { Player } from "../models/entities/Player";
+import { options } from "../Helper/TabOptions";
+import { isLarge, isMedium, isSmall, useBreakPoint } from "../hooks/useBreakPoint";
 import { roundService } from "../services/RoundService";
 import store from "../store";
-import Button from "./Button";
 import Header from "./Header";
 import Timer from "./Timer";
+import LearderBoard from "./LearderBoard";
+interface Props {
+  currentOption:number,
+  handleOption:(val:number)=>void;
+}
 
-interface Props {}
-
-const min = (a: number, b: number) => {
-  return a > b ? b : a;
-};
-
-const GameInfoArea: React.FC<Props> = (props) => {
+const GameInfoArea: React.FC<Props> = ({currentOption,handleOption}) => {
   const {
     round,
     currentPlayerId,
-    topScorers,
-    choosing,
-    myChance,
-    wordList,
     roundStart,
     setting,
-    currentWord,
   } = store.gameStore;
   const drawer = store.gameStore.getPlayerById(currentPlayerId!);
-
-  const firstThreePlayers: Player[] = [];
-
-  for (let i = 0; i < min(3, topScorers.length); i++) {
-    firstThreePlayers.push(topScorers[i]);
-  }
-
-  const memorizedWord = useMemo(() => {
-    return wordList.map((word) => (
-      <Button
-        onClick={() => {
-          roundService.roundSyncClient(word);
-        }}
-        key={word}
-      >
-        {word}
-      </Button>
-    ));
-  }, [myChance, choosing, wordList]);
 
   const onTimerEnd = () => {
     roundService.wordRevealClient();
   };
 
+  const breakpoint = useBreakPoint();
+
   return (
     <>
-      <Header className=" text-5xl"> Skribble</Header>
-      <div className="border-2 mt-2  border-black rounded-md p-2 text-xl">
-        <h2>Round :- {round}</h2>
-        <h2>Drawer :- {drawer ? drawer.name : ""}</h2>
-        <Timer
-          start={setting.round_time}
-          onTimerEnd={onTimerEnd}
-          stop={!roundStart}
-          reset={!roundStart}
-        ></Timer>
-      </div>
-      <div className="border-2 mt-2 border-black rounded-md p-2 text-xl">
-        <h2 className="text-center">Top Scorers</h2>
-        <div className="flex justify-between">
-          <h2 className=" text-green-700 underline">Player Name</h2>
-          <h2 className="underline">Scores</h2>
+      <div className="flex items-center lg:flex-col lg:w-full lg:h-full">
+        <Header size="text-2xl lg:text-5xl"> Skribble</Header>
+        <div className="flex text-xl w-full lg:flex-col lg:space-x-0 lg:border-2
+         lg:p-2  justify-center lg:border-black lg:rounded-md space-x-4">
+          <h2>Round :- {round}</h2>
+          {breakpoint !== "sm" && breakpoint !== "md" && (
+            <h2>Drawer :- {drawer ? drawer.name : ""}</h2>
+          )}
+          <Timer
+            start={setting.round_time}
+            onTimerEnd={onTimerEnd}
+            stop={!roundStart}
+            reset={!roundStart}
+          />
         </div>
-        {firstThreePlayers.map((player) => (
-          <div className="flex justify-between" key={player.id}>
-            <h2 className=" text-green-700">{player.name}</h2>
-            <h2>{player.score}</h2>
-          </div>
-        ))}
+        <div className={`w-full ${isSmall(breakpoint) || isMedium(breakpoint) || isLarge(breakpoint)?"hidden":"visible"}`}>
+          <LearderBoard/>
+        </div>
       </div>
-
-      <div className="border-2 mt-2 border-black rounded-md p-2 text-xl text-center ">
-        <h2>Events</h2>
-        <h2>
-          {choosing ? (
-            <span>
-              <span className="text-green-700">{drawer?.name}</span> is choosing
-              a word
-            </span>
-          ) : (
-            <span>
-              <span className="text-green-700">{drawer?.name}</span> starts
-              drawing
-            </span>
-          )}
-          {currentWord && !myChance && <h2>Word :- {currentWord} </h2>}
-          {choosing && myChance && !currentWord && (
-            <div className="mt-2 flex flex-col items-center space-y-4">
-              {memorizedWord}
+      { (isSmall(breakpoint) || isMedium(breakpoint) || isLarge(breakpoint)) &&
+        <div className="flex flex-col fixed py-4 pr-2 h-3/5 top-1/5 w-10  text-xl">
+        {options.map((op,index) => {
+          return (
+            <div
+              className={`${currentOption === index && " text-2xl  bg-gray-200" } text-center border h-full w-full cursor-pointer ${index === 0 ? "rounded-t-full":index === options.length-1 ? "rounded-b-full":""} border-black`}
+              style={{
+                textOrientation: "sideways",
+                writingMode: "vertical-lr",
+              }}
+            >
+              <h2 onClick={()=>{handleOption(index)}}>{op}</h2>
             </div>
-          )}
-        </h2>
+          );
+        })}
       </div>
+      }
     </>
   );
 };

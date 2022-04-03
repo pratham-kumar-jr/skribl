@@ -67,17 +67,22 @@ const CanvasGameArea: React.FC<Props> = (props) => {
     setPencil(0);
   }
 
+  const onExit = useCallback(()=>{
+    if(myChance && !choosing && drawing)
+      setDrawing(false);
+  },[myChance,choosing,drawing])
+
   return (
-    <>
-    <div className="bg-blue-200 w-full h-full border-2 border-black rounded-md " ref={containerRef}>
-      <Canvas onDraw={onDrawing} onStart={startDrawing} onStop={endDrawing} className="bg-white w-full h-full" />
+    <div className="h-full">
+      <div className="w-full h-9/10 border-2 border-black rounded-md " ref={containerRef}>
+        <Canvas onDraw={onDrawing} onStart={startDrawing} onStop={endDrawing} onEnd={onExit} className="bg-white w-full h-full" />
+      </div>
+      <div className="mt-4 flex justify-center space-x-4 h-1/10">
+        <Button icon={true} onClick={selectPencil}>P</Button>
+        <Button icon={true} onClick={selectEraser}>E</Button>
+        <Button icon={true} onClick={selectClear}>C</Button>
+      </div>
     </div>
-    <div className="mt-4 flex justify-center space-x-4">
-      <Button icon={true} onClick={selectPencil}>P</Button>
-      <Button icon={true} onClick={selectEraser}>E</Button>
-      <Button icon={true} onClick={selectClear}>C</Button>
-    </div>
-    </>
   );
 };
 

@@ -11,6 +11,18 @@ const Players: React.FC<Props> = (props) => {
   const { topScorers: players, gameState } = store.gameStore;
 
   const memoPlayers = useMemo(() => {
+    // return Array(8).fill(1).map((_,index)=>{
+    //   return (
+    //     <Avator
+    //       name={"test"}
+    //       pos={index}
+    //       id={index+""}
+    //       key={index}
+    //       score={0}
+    //       src={avatorImage}
+    //     />
+    //   );
+    // });
     return players.map((player, index) => {
       let pos:number|undefined;
       if (gameState === GameStateEnum.END) {
@@ -25,7 +37,7 @@ const Players: React.FC<Props> = (props) => {
           id={player.id}
           key={player.id}
           score={player.score}
-          src={avatorImage}
+          src={player.avator || avatorImage}
         />
       );
     })}

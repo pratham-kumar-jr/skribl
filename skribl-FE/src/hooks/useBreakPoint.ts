@@ -7,6 +7,23 @@ const breakPoints = {
   1260: "xl",
   1536: "2xl",
 };
+
+export const isSmall = (breakPoint: string): boolean => {
+  return breakPoint === "sm";
+};
+export const isMedium = (breakPoint: string): boolean => {
+  return breakPoint === "md";
+};
+export const isLarge = (breakPoint: string): boolean => {
+  return breakPoint === "lg";
+};
+export const isXLarge = (breakPoint: string): boolean => {
+  return breakPoint === "xl";
+};
+export const is2XLarge = (breakPoint: string): boolean => {
+  return breakPoint === "2xl";
+};
+
 export const useBreakPoint = () => {
   const [breakpoint, setBreakPoint] = useState("");
   const [windowSize, setWindowSize] = useState({

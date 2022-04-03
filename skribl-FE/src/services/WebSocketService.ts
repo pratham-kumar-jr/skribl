@@ -20,10 +20,8 @@ class WebSocketService {
       transports: ["websocket"],
     });
 
-    this.socket.on("connect_failed", () => {
-      console.log(
-        "[Web Socket Service] Sorry, there seems to be an issue with the connection!"
-      );
+    this.socket.on("/error", () => {
+      window.location.reload();
     });
 
     console.log("[Web Socket Service] Intialized");

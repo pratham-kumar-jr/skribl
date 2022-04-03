@@ -10,9 +10,9 @@ import store from "../store";
 interface Props {}
 
 const LobbyPage: React.FC<Props> = (props) => {
-  const {  roomId, me, setting } = store.gameStore;
+  const {  roomId, me, setting,players} = store.gameStore;
 
-  const disabled = me?.role === UserRole.JOINER;
+  const disabled = me?.role === UserRole.JOINER || players.length < 2;
   const roundOptions = Array(8)
     .fill(0)
     .map((_, index) => <option value={index + 3}>{index + 3}</option>);
@@ -42,6 +42,10 @@ const LobbyPage: React.FC<Props> = (props) => {
       total_rounds: setting.total_rounds,
     });
   };
+
+  const handleCopy = ()=>{
+    navigator.clipboard.writeText(window.location.host+"/?"+roomId)
+  }
 
   useEffect(() => {
     if (me && me.role === UserRole.CREATER) gameService.roomSyncClient({settings:setting});
@@ -73,6 +77,7 @@ const LobbyPage: React.FC<Props> = (props) => {
         </DropDown>
         <Button disabled={disabled} onClick={handleStartGame}>Start</Button>
         <h2 className=" mt-2 px-4 text-lg font-medium">Invite Link : <a href={`/?${roomId}`} target={"_blank"} className=" text-blue-400">{roomId}</a> </h2>
+        <Button icon={true} onClick={handleCopy}>S</Button>
       </div>
    </>
   );

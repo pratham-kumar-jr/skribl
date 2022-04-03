@@ -1,60 +1,108 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { canvasStore } from "../store/CanvasStore";
 interface Props {
-  onDraw:(context:CanvasRenderingContext2D, sx:number,sy:number,cx:number,cy:number)=>void;
-  onStart : ()=>void;
-  onStop: ()=>void;
-  className?:string
-  onClear?:()=>void;
+  onDraw: (
+    context: CanvasRenderingContext2D,
+    sx: number,
+    sy: number,
+    cx: number,
+    cy: number
+  ) => void;
+  onStart: () => void;
+  onStop: () => void;
+  className?: string;
+  onEnd: () => void;
 }
 interface Point {
   X: number;
   Y: number;
 }
 
-const Canvas: React.FC<Props> = ({onDraw,onStart,onStop,className}) => {
+const Canvas: React.FC<Props> = ({
+  onDraw,
+  onStart,
+  onStop,
+  className,
+  onEnd,
+}) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [start,setStart]  = useState<Point>({X:0,Y:0})
-  
-  const {Height,Width} = canvasStore;
- 
-  useEffect(()=>{
+  const [start, setStart] = useState<Point>({ X: 0, Y: 0 });
+
+  const { Height, Width } = canvasStore;
+
+  useEffect(() => {
     const canvas = canvasRef.current;
-    if(canvas){
+    if (canvas) {
       canvasStore.setCanvas(canvas);
     }
+  }, [canvasRef.current]);
 
-  },[canvasRef.current])
-
-  useEffect(()=>{
+  useEffect(() => {
     const canvas = canvasRef.current;
-    if(!canvas)
-      return;
+    if (!canvas) return;
     canvas.height = Height;
     canvas.width = Width;
+    canvas.style.height = "100%";
+    canvas.style.width = "100%";
+  }, [Height, Width]);
 
-  },[Height,Width])
+  const startDrawing = useCallback(
+    ({ nativeEvent }: any) => {
+      let { offsetX, offsetY } = nativeEvent;
+      if(!offsetX || !offsetY){
+        offsetX = nativeEvent.changedTouches[0].clientX;
+        offsetY = nativeEvent.changedTouches[0].clientY;
+      }
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      const bound = canvas.getBoundingClientRect();
+      const normalizeX = offsetX / bound.width;
+      const normalizeY = offsetY / bound.height;
+      setStart({ X: normalizeX, Y: normalizeY });
+      onStart();
+    },
+    [onStart, start, canvasRef]
+  );
 
-  const startDrawing = useCallback(({nativeEvent}:any)=>{ 
-    const { offsetX, offsetY } = nativeEvent;
-    setStart({X:offsetX,Y:offsetY});
-    onStart();
-  },[onStart,start]);
+  const finishDrawing = useCallback(() => {
+    onStop();
+  }, [onStop]);
 
-  const finishDrawing = useCallback( ()=>{
-      onStop();
-  },[onStop])
+  const canvasLeave = useCallback(() => {
+    onEnd();
+  }, [onEnd]);
 
-  const draw = useCallback(({nativeEvent}:any)=>{
-    const { offsetX, offsetY } = nativeEvent;
-    const context = canvasRef.current?.getContext("2d");
-    onDraw(context!,start!.X,start!.Y,offsetX,offsetY);
-    setStart({X:offsetX,Y:offsetY});
-  },[canvasRef.current,onDraw,start]);
-
+  const draw = useCallback(
+    ({ nativeEvent }: any) => {
+      let { offsetX, offsetY } = nativeEvent;
+      if(!offsetX || !offsetY){
+        offsetX = nativeEvent.changedTouches[0].clientX;
+        offsetY = nativeEvent.changedTouches[0].clientY;
+      }
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      const bound = canvas.getBoundingClientRect();
+      const normalizeX = offsetX / bound.width;
+      const normalizeY = offsetY / bound.height;
+      const context = canvas.getContext("2d");
+      onDraw(context!, start!.X, start!.Y, normalizeX, normalizeY);
+      setStart({ X: normalizeX, Y: normalizeY });
+    },
+    [canvasRef.current, onDraw, start]
+  );
 
   return (
-    <canvas ref={canvasRef} onMouseDown={startDrawing} onMouseUp={finishDrawing} onMouseMove={draw} className={className}></canvas>
+    <canvas
+      ref={canvasRef}
+      onMouseLeave={canvasLeave}
+      onMouseDown={startDrawing}
+      onMouseUp={finishDrawing}
+      onMouseMove={draw}
+      onTouchStart={startDrawing}
+      onTouchEnd={finishDrawing}
+      onTouchMove={draw}
+      className={className}
+    />
   );
 };
 

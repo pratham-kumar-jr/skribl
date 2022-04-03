@@ -8,4 +8,5 @@ export interface Player extends BaseEntity {
   name: string;
   role: UserRole;
   score: number;
+  avator?: string;
 }
