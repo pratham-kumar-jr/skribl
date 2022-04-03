@@ -20,7 +20,7 @@ class WebSocketService {
     this.io = new Server(server, {
       transports: ["websocket"],
       cors: {
-        origin: ["http://localhost:3000"],
+        origin: ["http://localhost:3000", "https://skribble-app.netlify.app/"],
       },
     });
 
