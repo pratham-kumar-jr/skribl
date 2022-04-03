@@ -10,7 +10,7 @@ interface Props {
 const Timer: React.FC<Props> = ({start,onTimerEnd,stop,reset}) => {
     const [timer,setTimer] = useState(start);
     useEffect(()=>{
-        let timerId:number;
+        let timerId:any;
         if(timer > 0 && !stop){
             timerId = setInterval(()=>{
                 setTimer(t=>--t);
