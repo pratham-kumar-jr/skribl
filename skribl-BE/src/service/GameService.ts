@@ -21,7 +21,7 @@ class GameService {
     return GameService._instance;
   }
 
-  public createGame(socket: Socket, payload: { name: string; id: string }) {
+  public createGame(socket: Socket, payload: PlayerDTO) {
     const uniqRoomId = Helper.generateRandomString(8, {
       includeLowerCase: true,
       includeUpperCase: true,
@@ -35,14 +35,11 @@ class GameService {
       id: socket.id,
       name: payload.name,
       role: UserRoleEnum.CREATER,
+      avator: payload.avator,
     });
 
     webSocketService.sendPrivate(socket, EventTypeEnum.ROOM_SYNC, {
-      player: {
-        name: player.name,
-        id: player.id,
-        role: UserRoleEnum.CREATER,
-      },
+      player: player.toJson(),
       room_id: player.roomId,
       game_state: GameStateEnum.LOBBY,
       player_status: 0,
@@ -62,11 +59,15 @@ class GameService {
       return;
     }
 
-    // TODO: check if game is in running state
+    if (room.gameStarted) {
+      return;
+    }
+
     const player = room.addPlayer(socket, {
       id: socket.id,
       name: payload.name,
       role: UserRoleEnum.JOINER,
+      avator: payload.avator,
     });
     const playerIds = room.players;
 
@@ -139,13 +140,48 @@ class GameService {
     }
 
     mapService.remove(player.id);
-    room.removePlayer(player.id);
     player.leaveRoom();
-    if (!room.players.length) {
+    if (room.players.length < 3) {
       mapService.remove(room.id);
+      webSocketService.sendToRoomByIO(EventTypeEnum.ERROR, room.id, {});
     } else {
+      if (room.players[room.currentPlayerIndex] === player.id) {
+        room.updateToNextPlayer();
+        room.setCurrenWord("");
+        room.resetRound();
+        const nextPlayerId = room.players[room.currentPlayerIndex];
+        webSocketService.sendToRoomByIO(EventTypeEnum.ROUND_SYNC, room.id, {
+          scores: room.scores,
+          turn_player_id: nextPlayerId,
+          round: room.currentRound,
+          choosing: true,
+          round_start: false,
+          round_change: true,
+        });
+        webSocketService.sendToRoomByIO(EventTypeEnum.DRAW, room.id, {
+          commands: [[2]],
+        });
+        const nextPlayer = mapService.getEntity<Player>(nextPlayerId);
+        if (!nextPlayer) {
+          console.log(
+            "[Game Service] Something went wrong, next Player does not exist."
+          );
+          webSocketService.sendToRoomByIO(
+            EventTypeEnum.ERROR,
+            room.id,
+            "Server Error"
+          );
+        } else {
+          webSocketService.sendPrivate(
+            nextPlayer.mySocket,
+            EventTypeEnum.ROUND_SYNC,
+            {
+              word_list: Helper.getWordList(),
+            }
+          );
+        }
+      }
       if (player.role === UserRoleEnum.CREATER) {
-        // TODO: Handle In Game Leave
         const nextPlayer = mapService.getEntity<Player>(room.players[0]);
         nextPlayer?.update(UserRoleEnum.CREATER);
         webSocketService.sendToRoomByIO(EventTypeEnum.ROOM_SYNC, room.id, {
@@ -158,6 +194,7 @@ class GameService {
         player: player.toJson(),
       });
     }
+    room.removePlayer(player.id);
   }
 
   public startGame(socket: Socket) {
@@ -207,6 +244,8 @@ class GameService {
     if (!player || !room) {
       return;
     }
+
+    room.setGameStarted(false);
 
     room.resetScore();
     room.setCurrenWord("");

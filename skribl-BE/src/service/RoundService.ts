@@ -94,7 +94,6 @@ class RoundService {
       return;
     }
 
-    // TODO: Give all player a chance in a single round, currently one chance = one round
     if (chosenWord && chosenWord.trim() !== "") {
       room.setCurrenWord(chosenWord);
       room.resetRound();
@@ -112,7 +111,13 @@ class RoundService {
         room.roomSetting.round_time - room.timeElapsed <= 0 ||
         room.getGuessPlayerCount() + 1 === room.players.length
       ) {
-        room.updateCurrentRound(room.currentRound + 1);
+        if (room.chanceCount === room.players.length) {
+          room.updateCurrentRound(room.currentRound + 1);
+          room.setChanceCount(1);
+        } else {
+          room.setChanceCount(room.chanceCount + 1);
+        }
+        console.log(room.currentRound);
         room.updateToNextPlayer();
         room.setCurrenWord("");
         room.resetRound();
