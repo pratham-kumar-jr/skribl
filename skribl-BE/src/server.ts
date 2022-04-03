@@ -24,4 +24,4 @@ const boot = (port: number) => {
   });
 };
 
-boot(4000);
+boot(process.env.PORT ? +process.env.PORT : 4000);
