@@ -14,7 +14,7 @@ const boot = (port: number) => {
     return res.send("Server is up");
   });
   app.all("*", (req, res) => {
-    res.status(404).send("<h1>404! Page not found</h1>");
+    res.status(404).send("404! Page not found");
   });
   const httpServer = createServer(app);
   webSocketService.init(httpServer);
