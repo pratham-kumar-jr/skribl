@@ -1,3 +1,3 @@
 export const WebSocketConfig = {
-  BASE_URL: "https://skribble-be.herokuapp.com",
+  BASE_URL: import.meta.env.VITE_WS_HOST ?? "http://localhost:4000",
 };

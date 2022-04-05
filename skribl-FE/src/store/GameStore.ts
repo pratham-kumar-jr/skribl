@@ -45,9 +45,17 @@ class GameStore {
   @observable
   private _roundStart: boolean;
 
+  @observable
+  private _wordLength?: number;
+
   @action
   public setTimeLeft(timeLeft: number) {
     this._timeLeft = timeLeft;
+  }
+
+  @action
+  public setWordLength(length: number) {
+    this._wordLength = length;
   }
 
   @computed
@@ -58,6 +66,11 @@ class GameStore {
   @computed
   public get roundStart(): boolean {
     return this._roundStart;
+  }
+
+  @computed
+  public get wordLength(): number | undefined {
+    return this._wordLength;
   }
 
   @action

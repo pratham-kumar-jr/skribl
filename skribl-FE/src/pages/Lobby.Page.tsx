@@ -6,6 +6,7 @@ import Header from "../components/Header";
 import { UserRole } from "../models/entities/Player";
 import { gameService } from "../services/GameService";
 import store from "../store";
+import {FiShare2} from "react-icons/fi"
 
 interface Props {}
 
@@ -76,8 +77,10 @@ const LobbyPage: React.FC<Props> = (props) => {
           {timeOptions}
         </DropDown>
         <Button disabled={disabled} onClick={handleStartGame}>Start</Button>
+        <div className="flex justify-center items-center">
         <h2 className=" mt-2 px-4 text-lg font-medium">Invite Link : <a href={`/?${roomId}`} target={"_blank"} className=" text-blue-400">{roomId}</a> </h2>
-        <Button icon={true} onClick={handleCopy}>S</Button>
+        <Button icon={FiShare2} onClick={handleCopy}/>
+        </div>
       </div>
    </>
   );

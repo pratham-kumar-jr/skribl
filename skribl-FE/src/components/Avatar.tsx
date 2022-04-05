@@ -10,15 +10,15 @@ interface Props extends ImgHTMLAttributes<HTMLImageElement> {
   pos?:number
 }
 
-const Avator: React.FC<Props> = ({ name, src,score,id,pos }) => {
+const Avatar: React.FC<Props> = ({ name, src,score,id,pos }) => {
   const {gameState,myId} = store.gameStore;
   
-  const myAvator = useMemo(()=>{return myId === id},[myId]);
+  const myavatar = useMemo(()=>{return myId === id},[myId]);
 
   const posClass = pos === 1? 'text-orange-500 scale-110':
                   pos === 2?'text-blue-500 scale-105':
                   pos === 3?'text-green-600 scale-102': 
-                  myAvator && gameState !== GameStateEnum.END? 'text-green-700 hove:scale-110':
+                  myavatar && gameState !== GameStateEnum.END? 'text-green-700 hove:scale-110':
                   'text-black:hover:scale-110';
 
   return (
@@ -33,7 +33,7 @@ const Avator: React.FC<Props> = ({ name, src,score,id,pos }) => {
   );
 };
 
-Avator.defaultProps = {
+Avatar.defaultProps = {
 };
 
-export default observer(Avator);
+export default observer(Avatar);

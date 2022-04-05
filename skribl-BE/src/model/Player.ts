@@ -10,7 +10,7 @@ class Player extends BaseSchema {
     private _socket: Socket,
     private _name: string,
     private _role: UserRoleEnum,
-    private _avator: string
+    private _avatar: string
   ) {
     super(_socket.id);
     mapService.setEntity<Player>(this.id, this);
@@ -34,8 +34,8 @@ class Player extends BaseSchema {
     return this._name;
   }
 
-  public get avator(): string {
-    return this._avator;
+  public get avatar(): string {
+    return this._avatar;
   }
   public get roomId(): string | undefined {
     return this._roomId;
@@ -55,7 +55,7 @@ class Player extends BaseSchema {
       name: this._name,
       id: this.id,
       role: this._role,
-      avator: this._avator,
+      avatar: this._avatar,
     };
   }
 }

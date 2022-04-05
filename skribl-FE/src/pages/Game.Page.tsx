@@ -14,17 +14,17 @@ const GamePage: React.FC<Props> = ({ handleOption, currentOption }) => {
   const breakpoint = useBreakPoint();
   return (
     <div className="h-full w-full border-2 border-black lg:p-4 lg:flex">
-      <div className="lg:w-1/4 p-2 lg:h-4/6">
+      <div className="lg:w-1/4 p-2 lg:h-4/5">
         <GameInfoArea
           currentOption={currentOption}
           handleOption={handleOption}
         />
       </div>
-      <div className="w-9/10 ml-auto p-2 h-4/6 lg:w-1/2">
+      <div className="w-9/10 ml-auto p-2 h-4/6 lg:h-4/5 lg:w-1/2">
         <CanvasGameArea />
       </div>
       <div
-        className={`lg:w-1/4 ml-auto w-9/10 p-2 h-56 lg:h-4/6 ${
+        className={`lg:w-1/4 ml-auto w-9/10 p-2 h-56 lg:h-4/5 ${
           (isSmall(breakpoint) || isMedium(breakpoint) || isLarge(breakpoint)) && currentOption !== 1
             ? "hidden"
             : "visible"

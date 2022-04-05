@@ -5,11 +5,15 @@ import Player from "../model/Player";
 import Room from "../model/Room";
 import { mapService } from "./MapService";
 import { webSocketService } from "./WebSocketService";
-
+import fs from "fs";
+import { random } from "lodash";
 class GameHelperService {
   private static _instance: GameHelperService | null;
+  private readonly wordlist: string[];
 
-  private constructor() {}
+  private constructor() {
+    this.wordlist = fs.readFileSync("src/utils/word.txt", "utf-8").split(",\n");
+  }
 
   public static getInstance(): GameHelperService {
     if (!GameHelperService._instance) {
@@ -97,6 +101,15 @@ class GameHelperService {
     }
 
     return { player, room };
+  }
+
+  public getRandomWords(): string[] {
+    const index = random(0, this.wordlist.length - 1);
+    return [
+      this.wordlist[index],
+      this.wordlist[(index + 1) % this.wordlist.length],
+      this.wordlist[(index + 2) % this.wordlist.length],
+    ];
   }
 }
 

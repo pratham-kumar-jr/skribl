@@ -1,12 +1,14 @@
 import React, { useMemo } from "react";
+import { IconType } from "react-icons/lib";
 
 interface Props {
-  children: string;
+  children?: string;
   onClick?: (event: any) => void;
   className?: string;
   type?: "button" | "submit";
   disabled?: boolean;
-  icon?: boolean;
+  icon?: IconType;
+  iconBorder?:boolean;
 }
 
 const Button: React.FC<Props> = (props) => {
@@ -17,23 +19,29 @@ const Button: React.FC<Props> = (props) => {
     []
   );
 
-  const iconButtonClass = useMemo(()=>`w-10 h-10 border-2 border-black rounded-full pt-1 pl-1 ${props.className} `,[])
+  const iconButtonClass = useMemo(
+    () =>
+      `w-10 h-10 ${props.iconBorder ? "border border-black rounded-md":""} ${props.className} `,
+    []
+  );
 
   return (
     <button
       type={props.type}
-      className={props.icon? iconButtonClass:normalButtonClass}
+      className={props.icon ? iconButtonClass : normalButtonClass}
       onClick={props.onClick}
       disabled={props.disabled}
     >
-      {props.children}
+      {" "}
+      {props.icon && <props.icon className="w-full h-full hover:animate-pulse" />}
+      {props.children && <p>{props.children}</p>}
     </button>
   );
 };
 
 Button.defaultProps = {
   type: "button",
-  icon: false,
+  iconBorder:true
 };
 
 export default React.memo(Button);

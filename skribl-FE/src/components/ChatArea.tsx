@@ -4,6 +4,7 @@ import { roundService } from "../services/RoundService";
 import store from "../store";
 import Button from "./Button";
 import Input from "./Input";
+import {GrSend} from "react-icons/gr"
 
 interface Props {}
 
@@ -38,13 +39,13 @@ const ChatArea: React.FC<Props> = (props) => {
             </p>
           ))}
         </div>
-      <div className="lg:h-1/10 border-black border-t-2 rounded-md flex justify-between items-center ">
+      <div className="lg:h-1/10 border-black border-t-2 rounded-md flex justify-between items-center px-2 ">
         <Input
           value={message}
           onChange={handleOnChange}
           placeholder={"Enter your message"}
         />
-        <Button onClick={sendMessage} icon={true}>S</Button>
+        <Button onClick={sendMessage} icon={GrSend} iconBorder={false}/>
       </div>
     </div>
   );

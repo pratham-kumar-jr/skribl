@@ -106,7 +106,7 @@ class Room extends BaseSchema {
       socket,
       playerPayload.name,
       playerPayload.role!,
-      playerPayload.avator
+      playerPayload.avatar
     );
     player.joinRoom(this.id);
     this._players.push(player.id);

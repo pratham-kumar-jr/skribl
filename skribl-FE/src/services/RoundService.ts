@@ -17,6 +17,7 @@ interface RoundSyncResponse {
   time_left: number;
   round_start?: boolean;
   round_change?: boolean;
+  word_length?: number;
 }
 class RoundService {
   private static _instance: RoundService | null;
@@ -63,7 +64,6 @@ class RoundService {
   }
 
   public wordRevealClient() {
-    console.log("word reveal after timer ends");
     if (store.gameStore.myChance) {
       webSocketService.EmitEvent(EventTypeEnum.WORD_REVEAL, {});
     }
@@ -103,6 +103,10 @@ class RoundService {
 
     if (state.round_start !== undefined) {
       store.gameStore.setRoundStart(state.round_start);
+    }
+
+    if (state.word_length) {
+      store.gameStore.setWordLength(state.word_length);
     }
   }
 

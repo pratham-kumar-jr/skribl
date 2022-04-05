@@ -45,8 +45,4 @@ export class Helper {
     const randomIndex = Math.floor(Math.random() * arr.length);
     return arr[randomIndex];
   }
-
-  public static getWordList(): string[] {
-    return ["train", "car", "bus"];
-  }
 }

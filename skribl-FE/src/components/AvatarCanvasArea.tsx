@@ -8,7 +8,7 @@ interface Props {
     setDrawing:Dispatch<React.SetStateAction<boolean>>,
 }
 
-const AvatorCanvasArea: React.FC<Props> = ({tool,drawing,setDrawing}) => {
+const AvatarCanvasArea: React.FC<Props> = ({tool,drawing,setDrawing}) => {
 
   const onDrawing = useCallback(
     (
@@ -54,6 +54,6 @@ const AvatorCanvasArea: React.FC<Props> = ({tool,drawing,setDrawing}) => {
   );
 };
 
-AvatorCanvasArea.defaultProps = {};
+AvatarCanvasArea.defaultProps = {};
 
-export default React.memo(AvatorCanvasArea);
+export default React.memo(AvatarCanvasArea);

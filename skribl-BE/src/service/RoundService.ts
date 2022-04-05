@@ -2,7 +2,6 @@ import { Socket } from "socket.io";
 import { EventTypeEnum } from "../Enums/EvenTypeEnum";
 import { GameStateEnum } from "../Enums/GameStateEnum";
 import Player from "../model/Player";
-import { Helper } from "../utils/Helper";
 import { gameHelperService } from "./GameHelperService";
 import { mapService } from "./MapService";
 import { webSocketService } from "./WebSocketService";
@@ -100,6 +99,7 @@ class RoundService {
       webSocketService.sendToRoomByIO(EventTypeEnum.ROUND_SYNC, room.id, {
         choosing: false,
         round_start: true,
+        word_length: chosenWord.length,
       });
     } else {
       if (room.isFinalOver()) {
@@ -117,7 +117,6 @@ class RoundService {
         } else {
           room.setChanceCount(room.chanceCount + 1);
         }
-        console.log(room.currentRound);
         room.updateToNextPlayer();
         room.setCurrenWord("");
         room.resetRound();
@@ -148,7 +147,7 @@ class RoundService {
             nextPlayer.mySocket,
             EventTypeEnum.ROUND_SYNC,
             {
-              word_list: Helper.getWordList(),
+              word_list: gameHelperService.getRandomWords(),
             }
           );
         }

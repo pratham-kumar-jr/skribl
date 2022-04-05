@@ -35,7 +35,7 @@ class GameService {
       id: socket.id,
       name: payload.name,
       role: UserRoleEnum.CREATER,
-      avator: payload.avator,
+      avatar: payload.avatar,
     });
 
     webSocketService.sendPrivate(socket, EventTypeEnum.ROOM_SYNC, {
@@ -67,7 +67,7 @@ class GameService {
       id: socket.id,
       name: payload.name,
       role: UserRoleEnum.JOINER,
-      avator: payload.avator,
+      avatar: payload.avatar,
     });
     const playerIds = room.players;
 
@@ -176,7 +176,7 @@ class GameService {
             nextPlayer.mySocket,
             EventTypeEnum.ROUND_SYNC,
             {
-              word_list: Helper.getWordList(),
+              word_list: gameHelperService.getRandomWords(),
             }
           );
         }
@@ -219,6 +219,7 @@ class GameService {
 
     room.setCurrentPlayerIndex(room.players.indexOf(drawer.id));
     room.resetScore();
+    room.setGameStarted(true);
 
     webSocketService.sendToRoomByIO(EventTypeEnum.ROUND_SYNC, room.id, {
       game_state: GameStateEnum.START,
@@ -234,7 +235,7 @@ class GameService {
     });
 
     webSocketService.sendPrivate(drawer.mySocket, EventTypeEnum.ROUND_SYNC, {
-      word_list: Helper.getWordList(),
+      word_list: gameHelperService.getRandomWords(),
     });
   }
 

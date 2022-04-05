@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-
+import {MdOutlineTimer} from "react-icons/md";
 interface Props {
     start:number;
     onTimerEnd: ()=>void;
@@ -31,7 +31,7 @@ const Timer: React.FC<Props> = ({start,onTimerEnd,stop,reset}) => {
 
     useEffect(()=>{if(reset)setTimer(start)},[reset])
 
-    return<h2>Timer : {timer}</h2>
+    return<h2 className="flex items-center"><MdOutlineTimer className={`mr-2 ${timer !== start && timer>0 ?"animate-bounce" :""}`}/> {timer}</h2>
 }
 
 Timer.defaultProps = {

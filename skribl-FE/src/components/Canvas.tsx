@@ -49,12 +49,14 @@ const Canvas: React.FC<Props> = ({
   const startDrawing = useCallback(
     ({ nativeEvent }: any) => {
       let { offsetX, offsetY } = nativeEvent;
-      if(!offsetX || !offsetY){
-        offsetX = nativeEvent.changedTouches[0].clientX;
-        offsetY = nativeEvent.changedTouches[0].clientY;
-      }
       const canvas = canvasRef.current;
       if (!canvas) return;
+      if(window.TouchEvent){
+        if(nativeEvent.changedTouches?.length){
+          offsetX = nativeEvent.changedTouches[0].clientX - canvas.offsetLeft;
+          offsetY = nativeEvent.changedTouches[0].clientY - canvas.offsetTop;
+        }
+      }
       const bound = canvas.getBoundingClientRect();
       const normalizeX = offsetX / bound.width;
       const normalizeY = offsetY / bound.height;
@@ -75,12 +77,14 @@ const Canvas: React.FC<Props> = ({
   const draw = useCallback(
     ({ nativeEvent }: any) => {
       let { offsetX, offsetY } = nativeEvent;
-      if(!offsetX || !offsetY){
-        offsetX = nativeEvent.changedTouches[0].clientX;
-        offsetY = nativeEvent.changedTouches[0].clientY;
-      }
       const canvas = canvasRef.current;
       if (!canvas) return;
+      if(window.TouchEvent){
+        if(nativeEvent.changedTouches?.length){
+          offsetX = nativeEvent.changedTouches[0].clientX - canvas.offsetLeft;
+          offsetY = nativeEvent.changedTouches[0].clientY - canvas.offsetTop;
+        }
+      }
       const bound = canvas.getBoundingClientRect();
       const normalizeX = offsetX / bound.width;
       const normalizeY = offsetY / bound.height;

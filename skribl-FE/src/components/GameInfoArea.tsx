@@ -18,6 +18,9 @@ const GameInfoArea: React.FC<Props> = ({currentOption,handleOption}) => {
     currentPlayerId,
     roundStart,
     setting,
+    wordLength,
+    myChance,
+    choosing,
   } = store.gameStore;
   const drawer = store.gameStore.getPlayerById(currentPlayerId!);
 
@@ -26,23 +29,23 @@ const GameInfoArea: React.FC<Props> = ({currentOption,handleOption}) => {
   };
 
   const breakpoint = useBreakPoint();
-
   return (
     <>
       <div className="flex items-center lg:flex-col lg:w-full lg:h-full">
         <Header size="text-2xl lg:text-5xl"> Skribble</Header>
-        <div className="flex text-xl w-full lg:flex-col lg:space-x-0 lg:border-2
+        <div className="flex text-xl flex-wrap w-full lg:flex-col lg:space-x-0 lg:border-2
          lg:p-2  justify-center lg:border-black lg:rounded-md space-x-4">
           <h2>Round :- {round}</h2>
           {breakpoint !== "sm" && breakpoint !== "md" && (
             <h2>Drawer :- {drawer ? drawer.name : ""}</h2>
-          )}
+            )}
           <Timer
             start={setting.round_time}
             onTimerEnd={onTimerEnd}
             stop={!roundStart}
             reset={!roundStart}
-          />
+            />
+            {!myChance && !choosing && <h2> Word :- {Array(wordLength || 4).fill("_").join(" ")}</h2>}
         </div>
         <div className={`w-full ${isSmall(breakpoint) || isMedium(breakpoint) || isLarge(breakpoint)?"hidden":"visible"}`}>
           <LearderBoard/>

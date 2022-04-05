@@ -4,6 +4,9 @@ import { canvasService } from "../services/CanvasService";
 import store from "../store";
 import Button from "./Button";
 import Canvas from "./Canvas";
+import {TiPencil} from  "react-icons/ti"
+import {BiEraser} from "react-icons/bi"
+import {AiOutlineClear} from "react-icons/ai"
 
 interface Props {}
 
@@ -78,9 +81,9 @@ const CanvasGameArea: React.FC<Props> = (props) => {
         <Canvas onDraw={onDrawing} onStart={startDrawing} onStop={endDrawing} onEnd={onExit} className="bg-white w-full h-full" />
       </div>
       <div className="mt-4 flex justify-center space-x-4 h-1/10">
-        <Button icon={true} onClick={selectPencil}>P</Button>
-        <Button icon={true} onClick={selectEraser}>E</Button>
-        <Button icon={true} onClick={selectClear}>C</Button>
+        <Button icon={TiPencil} onClick={selectPencil}/>
+        <Button icon={BiEraser} onClick={selectEraser}/>
+        <Button icon={AiOutlineClear} onClick={selectClear}/>
       </div>
     </div>
   );
