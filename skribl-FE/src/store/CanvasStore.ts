@@ -12,6 +12,9 @@ class CanvasStore {
   @observable
   private _width: number;
 
+  @observable
+  private _cursor: string;
+
   @action
   public setCanvas(canvas: HTMLCanvasElement) {
     this._canvas = canvas;
@@ -27,6 +30,11 @@ class CanvasStore {
     this._width = width;
   }
 
+  @action
+  public setCursor(cursor: string) {
+    this._cursor = cursor;
+  }
+
   @computed
   public get Height(): number {
     return this._height;
@@ -38,6 +46,11 @@ class CanvasStore {
   }
 
   @computed
+  public get Cursor(): string {
+    return this._cursor;
+  }
+
+  @computed
   public get Canvas(): HTMLCanvasElement | null {
     return this._canvas;
   }
@@ -45,6 +58,7 @@ class CanvasStore {
   private constructor() {
     this._height = 500;
     this._width = 500;
+    this._cursor = "default";
     makeObservable(this);
   }
 

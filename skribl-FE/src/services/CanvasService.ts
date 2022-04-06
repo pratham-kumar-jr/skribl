@@ -91,6 +91,10 @@ class CanvasService {
   public canvasToUrl(): string | undefined {
     return canvasStore.Canvas?.toDataURL();
   }
+
+  public selectCursor(cursor: string) {
+    canvasStore.setCursor(cursor);
+  }
 }
 
 export const canvasService = CanvasService.getInstance();

@@ -1,14 +1,19 @@
 import React, { Dispatch, useCallback, useRef, useState } from "react";
 import { canvasService } from "../services/CanvasService";
 import Canvas from "./Canvas";
-
+import withCursor from '../HOC/withCursor'
+import { canvasStore } from "../store/CanvasStore";
 interface Props {
     tool:number,
     drawing:boolean,
     setDrawing:Dispatch<React.SetStateAction<boolean>>,
+    context?: any;
 }
 
-const AvatarCanvasArea: React.FC<Props> = ({tool,drawing,setDrawing}) => {
+const AvatarCanvasArea: React.FC<Props> = ({tool,drawing,setDrawing, context}) => {
+
+  // const [cursor, setCursor] = useState<string>('default');
+  const {onCursor} = context;
 
   const onDrawing = useCallback(
     (
@@ -22,7 +27,7 @@ const AvatarCanvasArea: React.FC<Props> = ({tool,drawing,setDrawing}) => {
       if (tool === 0) {
         canvasService.drawOnCanvas(startX, startY, currentX, currentY);
       } else if (tool === 1) {
-        canvasService.eraseOnCanvas(currentX, currentY, 20);
+        canvasService.eraseOnCanvas(currentX, currentY, 30);
       }
     },
     [drawing, tool]
@@ -40,9 +45,18 @@ const AvatarCanvasArea: React.FC<Props> = ({tool,drawing,setDrawing}) => {
     setDrawing(false);
   }, []);
 
+  const cursor = React.useMemo(() => {
+    if(tool === 0 ) 
+      return 'pencil';
+    else if(tool === 1)
+      return 'eraser';
+    else 
+      return 'default';
+  }, [tool])
+
   return (
     <>
-      <div className="w-full h-full rounded-md">
+      <div className="w-full h-full rounded-md cursor-none" onMouseEnter={() => onCursor(cursor)} onMouseLeave={() => onCursor('default')}>
         <Canvas
           onDraw={onDrawing}
           onStart={startDrawing}
@@ -56,4 +70,4 @@ const AvatarCanvasArea: React.FC<Props> = ({tool,drawing,setDrawing}) => {
 
 AvatarCanvasArea.defaultProps = {};
 
-export default React.memo(AvatarCanvasArea);
+export default withCursor(AvatarCanvasArea);
