@@ -15,7 +15,6 @@ import {TiPencil} from  "react-icons/ti"
 import {BiEraser} from "react-icons/bi"
 import {AiOutlineClear} from "react-icons/ai"
 import {GiPerspectiveDiceSixFacesRandom} from "react-icons/gi"
-import CursorProvider from "../providers/CursorProvider";
 
 interface Props {
   roomId: string;
@@ -96,9 +95,7 @@ const MainPage: React.FC<Props> = ({ roomId }) => {
         <div className=" border-2 p-2 h-4/6 lg:h-5/6 border-black rounded-md">
           <div className="m-1 border-2 border-black w-full md:w-1/2 mx-auto h-4/6 lg:w-full lg:h-3/5 rounded-md">
             <div className={`${defaultavatar ? "hidden" : ""} w-full h-full`}>
-              <CursorProvider>
                 <AvatarCanvasArea tool={tool} drawing={drawing} setDrawing={setDrawing}/>
-              </CursorProvider>
             </div>
             <div className={`${!defaultavatar ? "hidden":""} w-full h-full`}>
               <img src={avatarImage} className="object-fit w-full h-full"></img>

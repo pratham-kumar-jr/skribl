@@ -1,19 +1,49 @@
-import React, { Dispatch, useCallback, useRef, useState } from "react";
+import React, { Dispatch, useCallback, useState } from "react";
 import { canvasService } from "../services/CanvasService";
 import Canvas from "./Canvas";
-import withCursor from '../HOC/withCursor'
 import { canvasStore } from "../store/CanvasStore";
+import { CursorTypes } from '../enums/CursorTypes';
 interface Props {
     tool:number,
     drawing:boolean,
     setDrawing:Dispatch<React.SetStateAction<boolean>>,
-    context?: any;
 }
 
-const AvatarCanvasArea: React.FC<Props> = ({tool,drawing,setDrawing, context}) => {
+const SUPPORTED_CURSORS = [CursorTypes.DEFAULT, CursorTypes.ERASER, CursorTypes.PENCIL];
 
-  // const [cursor, setCursor] = useState<string>('default');
-  const {onCursor} = context;
+const AvatarCanvasArea: React.FC<Props> = ({tool,drawing,setDrawing}) => {
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
+
+  const onMouseMove = (event: MouseEvent) => {
+    const { pageX: x, pageY: y } = event
+    setMousePosition({ x, y })
+  }
+
+  React.useEffect(() => {
+    document.addEventListener('mousemove', onMouseMove)
+
+    return () => {
+      document.removeEventListener('mousemove', onMouseMove)
+    }
+  })
+
+  const { x, y } = mousePosition
+
+  const onCursor = (cursor: CursorTypes) => {
+    cursor = (SUPPORTED_CURSORS.includes(cursor) && cursor) || CursorTypes.DEFAULT
+    canvasStore.setCursor(cursor);
+  };
+
+  const selectCursor = useCallback(() => {
+    let cursor = CursorTypes.DEFAULT;
+    if(tool === 0 ) 
+      cursor = CursorTypes.PENCIL;
+    else if(tool === 1)
+      cursor = CursorTypes.ERASER;
+    onCursor(cursor);
+  }, [tool])
+
+  const selectDefaultCursor = useCallback(() => onCursor(CursorTypes.DEFAULT), []);
 
   const onDrawing = useCallback(
     (
@@ -45,18 +75,16 @@ const AvatarCanvasArea: React.FC<Props> = ({tool,drawing,setDrawing, context}) =
     setDrawing(false);
   }, []);
 
-  const cursor = React.useMemo(() => {
-    if(tool === 0 ) 
-      return 'pencil';
-    else if(tool === 1)
-      return 'eraser';
-    else 
-      return 'default';
-  }, [tool])
-
   return (
     <>
-      <div className="w-full h-full rounded-md cursor-none" onMouseEnter={() => onCursor(cursor)} onMouseLeave={() => onCursor('default')}>
+      <div className="w-full h-full rounded-md cursor-none" onMouseEnter={selectCursor} onMouseLeave={selectDefaultCursor}>
+        <ins
+        className={`cursor ${canvasStore.Cursor}`}
+        style={{
+          left: `${x}px`,
+          top: `${y}px`,
+        }}
+      />
         <Canvas
           onDraw={onDrawing}
           onStart={startDrawing}
@@ -70,4 +98,4 @@ const AvatarCanvasArea: React.FC<Props> = ({tool,drawing,setDrawing, context}) =
 
 AvatarCanvasArea.defaultProps = {};
 
-export default withCursor(AvatarCanvasArea);
+export default React.memo(AvatarCanvasArea);

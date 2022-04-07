@@ -1,4 +1,5 @@
 import { action, computed, makeObservable, observable } from "mobx";
+import { CursorTypes } from "../enums/CursorTypes";
 
 class CanvasStore {
   private static _instance: CanvasStore | null;
@@ -58,7 +59,7 @@ class CanvasStore {
   private constructor() {
     this._height = 500;
     this._width = 500;
-    this._cursor = "default";
+    this._cursor = CursorTypes.DEFAULT;
     makeObservable(this);
   }
 

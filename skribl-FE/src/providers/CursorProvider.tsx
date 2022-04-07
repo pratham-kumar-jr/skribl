@@ -1,5 +1,4 @@
 import React, { useState, useEffect, ReactNode } from 'react'
-import { canvasService } from '../services/CanvasService'
 import { canvasStore } from '../store/CanvasStore'
 
 export const CursorContext = React.createContext<string | ({ onCursor: (cursorType: string) => void; })>('cursorContext')
@@ -32,7 +31,7 @@ const EraserCursor: React.FC<Props> = ({ children }) => {
 
   const onCursor = (cursorType: string) => {
     cursorType = (SUPPORTED_CURSORS.includes(cursorType) && cursorType) || 'default'
-    canvasService.selectCursor(cursorType);
+    canvasStore.setCursor(cursorType);
   }
   
   return (
