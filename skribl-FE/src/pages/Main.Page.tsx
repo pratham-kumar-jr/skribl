@@ -70,6 +70,7 @@ const MainPage: React.FC<Props> = ({ roomId }) => {
   },[])
 
   const selectPencil = () => {
+    setDefaultavatar(false)
     setTool(0);
   };
 
@@ -94,7 +95,7 @@ const MainPage: React.FC<Props> = ({ roomId }) => {
         <div className=" border-2 p-2 h-4/6 lg:h-5/6 border-black rounded-md">
           <div className="m-1 border-2 border-black w-full md:w-1/2 mx-auto h-4/6 lg:w-full lg:h-3/5 rounded-md">
             <div className={`${defaultavatar ? "hidden" : ""} w-full h-full`}>
-              <AvatarCanvasArea tool={tool} drawing={drawing} setDrawing={setDrawing}/>
+                <AvatarCanvasArea tool={tool} drawing={drawing} setDrawing={setDrawing}/>
             </div>
             <div className={`${!defaultavatar ? "hidden":""} w-full h-full`}>
               <img src={avatarImage} className="object-fit w-full h-full"></img>
@@ -110,6 +111,7 @@ const MainPage: React.FC<Props> = ({ roomId }) => {
             <Input
               value={name}
               onChange={handleInput}
+              onKeyDown={(e) => e.key === "Enter" && handlePlay()}
               placeholder={"Enter your name"}
               className={" border-2 border-black rounded-md "}
             />

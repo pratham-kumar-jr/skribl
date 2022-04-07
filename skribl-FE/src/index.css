@@ -30,3 +30,23 @@ vertical {
   font-family: "Whale";
   src: url("./assests//fonts//WhaleITriedRegular-xWq0.ttf");
 }
+
+@layer components {
+  .cursor {
+    background: white;
+    position: absolute;
+    z-index: 999999999;
+    transform: translate(0%, 0%);
+    pointer-events: none;
+    border: 1px solid black;
+  }
+
+  .eraser {
+    width: 15px;
+    height: 15px;
+  }
+
+  .default {
+    display: none;
+  }
+}
