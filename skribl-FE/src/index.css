@@ -28,25 +28,13 @@ vertical {
 
 @font-face {
   font-family: "Whale";
-  src: url("./assests//fonts//WhaleITriedRegular-xWq0.ttf");
+  src: url("./assests/fonts/WhaleITriedRegular-xWq0.ttf");
 }
 
-@layer components {
-  .cursor {
-    background: white;
-    position: absolute;
-    z-index: 999999999;
-    transform: translate(0%, 0%);
-    pointer-events: none;
-    border: 1px solid black;
-  }
+.eraser {
+  cursor: url("./assests/cursors/eraser.svg"), pointer;
+}
 
-  .eraser {
-    width: 15px;
-    height: 15px;
-  }
-
-  .default {
-    display: none;
-  }
+.pencil {
+  cursor: url("./assests/cursors/pencil.svg"), pointer;
 }

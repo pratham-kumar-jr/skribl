@@ -1,4 +1,4 @@
-export enum CursorTypes {
+export enum CursorTypeEnum {
   DEFAULT = "default",
   PENCIL = "pencil",
   ERASER = "eraser",

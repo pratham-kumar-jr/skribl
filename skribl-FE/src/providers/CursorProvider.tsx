@@ -1,39 +1,43 @@
-import React, { useState, useEffect, ReactNode } from 'react'
-import { canvasStore } from '../store/CanvasStore'
+import React, { useState, useEffect, ReactNode } from "react";
+import { CursorTypeEnum } from "../enums/CursorTypeEnum";
+import { canvasStore } from "../store/CanvasStore";
 
-export const CursorContext = React.createContext<string | ({ onCursor: (cursorType: string) => void; })>('cursorContext')
+export const CursorContext = React.createContext<
+  string | { onCursor: (cursorType: string) => void }
+>("cursorContext");
 
-const SUPPORTED_CURSORS = ['default', 'eraser', 'pencil']
+const SUPPORTED_CURSORS = ["default", "eraser", "pencil"];
 
 interface Props {
-  children?: ReactNode,
+  children?: ReactNode;
 }
 
 const EraserCursor: React.FC<Props> = ({ children }) => {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
-  const cursor = canvasStore.Cursor;
+  const cursor = canvasStore.cursor;
 
   const onMouseMove = (event: MouseEvent) => {
-    const { pageX: x, pageY: y } = event
-    setMousePosition({ x, y })
-  }
+    const { pageX: x, pageY: y } = event;
+    setMousePosition({ x, y });
+  };
 
   useEffect(() => {
-    document.addEventListener('mousemove', onMouseMove)
+    document.addEventListener("mousemove", onMouseMove);
 
     return () => {
-      document.removeEventListener('mousemove', onMouseMove)
-    }
-  })
+      document.removeEventListener("mousemove", onMouseMove);
+    };
+  });
 
-  const { x, y } = mousePosition
+  const { x, y } = mousePosition;
 
   const onCursor = (cursorType: string) => {
-    cursorType = (SUPPORTED_CURSORS.includes(cursorType) && cursorType) || 'default'
-    canvasStore.setCursor(cursorType);
-  }
-  
+    cursorType =
+      (SUPPORTED_CURSORS.includes(cursorType) && cursorType) || "default";
+    canvasStore.setCursor(cursorType as CursorTypeEnum);
+  };
+
   return (
     <CursorContext.Provider value={{ onCursor }}>
       <ins
@@ -45,9 +49,9 @@ const EraserCursor: React.FC<Props> = ({ children }) => {
       />
       {children}
     </CursorContext.Provider>
-  )
-}
+  );
+};
 
-EraserCursor.defaultProps = {}
+EraserCursor.defaultProps = {};
 
-export default React.memo(EraserCursor)
+export default React.memo(EraserCursor);

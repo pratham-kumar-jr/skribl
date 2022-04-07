@@ -6,15 +6,22 @@ import { gameStore } from "../store/GameStore";
 import { UserRole } from "../models/entities/Player";
 import Header from "../components/Header";
 import Input from "../components/Input";
-import { isLarge, isMedium, isSmall, useBreakPoint } from "../hooks/useBreakPoint";
+import {
+  isLarge,
+  isMedium,
+  isSmall,
+  useBreakPoint,
+} from "../hooks/useBreakPoint";
 import AvatarCanvasArea from "../components/AvatarCanvasArea";
 import avatarImage from "../assests/avatar.png";
 import { canvasService } from "../services/CanvasService";
-import {FiHelpCircle} from "react-icons/fi"
-import {TiPencil} from  "react-icons/ti"
-import {BiEraser} from "react-icons/bi"
-import {AiOutlineClear} from "react-icons/ai"
-import {GiPerspectiveDiceSixFacesRandom} from "react-icons/gi"
+import { FiHelpCircle } from "react-icons/fi";
+import { TiPencil } from "react-icons/ti";
+import { BiEraser } from "react-icons/bi";
+import { AiOutlineClear } from "react-icons/ai";
+import { GiPerspectiveDiceSixFacesRandom } from "react-icons/gi";
+import store from "../store";
+import { CursorTypeEnum } from "../enums/CursorTypeEnum";
 
 interface Props {
   roomId: string;
@@ -22,11 +29,10 @@ interface Props {
 
 const MainPage: React.FC<Props> = ({ roomId }) => {
   const [name, setName] = useState("");
-  const [defaultavatar,setDefaultavatar] = useState(true);
+  const [defaultavatar, setDefaultavatar] = useState(true);
 
   const [drawing, setDrawing] = useState(false);
   const [tool, setTool] = useState(0);
-
 
   const breakPoint = useBreakPoint();
   const handleInput = (e: any) => {
@@ -35,22 +41,22 @@ const MainPage: React.FC<Props> = ({ roomId }) => {
 
   const handlePlay = () => {
     if (_.isEmpty(name)) return;
-    if(_.isEmpty(roomId)){
+    if (_.isEmpty(roomId)) {
       gameService.createRoomClient({
         id: gameStore.myId || "",
         name: name,
         role: UserRole.CREATER,
         score: 0,
-        avatar: defaultavatar? "" :canvasService.canvasToUrl()
+        avatar: defaultavatar ? "" : canvasService.canvasToUrl(),
       });
-    }else{
+    } else {
       gameService.joinRoomClient(roomId, {
         id: gameStore.myId || "",
         name: name,
         role: UserRole.JOINER,
         score: 0,
-        avatar: defaultavatar? "" :canvasService.canvasToUrl()
-      });  
+        avatar: defaultavatar ? "" : canvasService.canvasToUrl(),
+      });
     }
   };
 
@@ -65,22 +71,25 @@ const MainPage: React.FC<Props> = ({ roomId }) => {
     });
   }, []);
 
-  const handleDefault = useCallback(()=>{
-    setDefaultavatar(t=>!t)
-  },[])
+  const handleDefault = useCallback(() => {
+    setDefaultavatar((t) => !t);
+  }, []);
 
   const selectPencil = () => {
-    setDefaultavatar(false)
+    setDefaultavatar(false);
+    store.canvasStore.setCursor(CursorTypeEnum.PENCIL);
     setTool(0);
   };
 
   const selectEraser = () => {
     setTool(1);
+    store.canvasStore.setCursor(CursorTypeEnum.ERASER);
   };
 
   const selectClear = () => {
     canvasService.clearCanvas();
     setTool(0);
+    store.canvasStore.setCursor(CursorTypeEnum.PENCIL);
   };
 
   return (
@@ -95,17 +104,24 @@ const MainPage: React.FC<Props> = ({ roomId }) => {
         <div className=" border-2 p-2 h-4/6 lg:h-5/6 border-black rounded-md">
           <div className="m-1 border-2 border-black w-full md:w-1/2 mx-auto h-4/6 lg:w-full lg:h-3/5 rounded-md">
             <div className={`${defaultavatar ? "hidden" : ""} w-full h-full`}>
-                <AvatarCanvasArea tool={tool} drawing={drawing} setDrawing={setDrawing}/>
+              <AvatarCanvasArea
+                tool={tool}
+                drawing={drawing}
+                setDrawing={setDrawing}
+              />
             </div>
-            <div className={`${!defaultavatar ? "hidden":""} w-full h-full`}>
+            <div className={`${!defaultavatar ? "hidden" : ""} w-full h-full`}>
               <img src={avatarImage} className="object-fit w-full h-full"></img>
             </div>
           </div>
           <div className=" flex space-x-2 p-1 justify-center">
-            <Button icon={TiPencil} onClick={selectPencil}/>
-            <Button icon={BiEraser} onClick={selectEraser}/>
-            <Button icon={AiOutlineClear} onClick={selectClear}/>
-            <Button icon={GiPerspectiveDiceSixFacesRandom} onClick={handleDefault}/>
+            <Button icon={TiPencil} onClick={selectPencil} />
+            <Button icon={BiEraser} onClick={selectEraser} />
+            <Button icon={AiOutlineClear} onClick={selectClear} />
+            <Button
+              icon={GiPerspectiveDiceSixFacesRandom}
+              onClick={handleDefault}
+            />
           </div>
           <div className="mt-6 flex justify-start items-center md:w-1/2 w-full lg:w-full mx-auto space-x-2">
             <Input
@@ -122,13 +138,15 @@ const MainPage: React.FC<Props> = ({ roomId }) => {
         </div>
       </div>
       <div className="lg:w-4/6 h-2/6 lg:h-full  p-2 relative">
-        {!(isMedium(breakPoint) || isLarge(breakPoint) || isSmall(breakPoint))  && (
-          <Header className="mx-auto">Skribble</Header>
-        )}
+        {!(
+          isMedium(breakPoint) ||
+          isLarge(breakPoint) ||
+          isSmall(breakPoint)
+        ) && <Header className="mx-auto">Skribble</Header>}
         <div className="lg:mt-6 mx-auto max-w-max lg:ml-4">
-        <Button onClick={handlePlay}>Play</Button>
+          <Button onClick={handlePlay}>Play</Button>
         </div>
-        <Button icon={FiHelpCircle} className={`absolute bottom-3 right-3`}/>
+        <Button icon={FiHelpCircle} className={`absolute bottom-3 right-3`} />
       </div>
     </div>
   );
