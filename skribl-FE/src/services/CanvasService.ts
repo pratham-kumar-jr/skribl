@@ -42,7 +42,6 @@ class CanvasService {
 
     currentX *= canvas.width;
     currentY *= canvas.height;
-
     context.beginPath();
     context.moveTo(startX, startY);
     context.lineTo(currentX, currentY);

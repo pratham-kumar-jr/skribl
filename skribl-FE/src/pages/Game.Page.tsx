@@ -3,7 +3,12 @@ import CanvasGameArea from "../components/CanvasGameArea";
 import ChatArea from "../components/ChatArea";
 import GameInfoArea from "../components/GameInfoArea";
 import LearderBoard from "../components/LearderBoard";
-import { isLarge, isMedium, isSmall, useBreakPoint } from "../hooks/useBreakPoint";
+import {
+  isLarge,
+  isMedium,
+  isSmall,
+  useBreakPoint,
+} from "../hooks/useBreakPoint";
 
 interface Props {
   currentOption: number;
@@ -25,7 +30,10 @@ const GamePage: React.FC<Props> = ({ handleOption, currentOption }) => {
       </div>
       <div
         className={`lg:w-1/4 ml-auto w-9/10 p-2 h-56 lg:h-4/5 ${
-          (isSmall(breakpoint) || isMedium(breakpoint) || isLarge(breakpoint)) && currentOption !== 1
+          (isSmall(breakpoint) ||
+            isMedium(breakpoint) ||
+            isLarge(breakpoint)) &&
+          currentOption !== 1
             ? "hidden"
             : "visible"
         }`}
@@ -34,10 +42,11 @@ const GamePage: React.FC<Props> = ({ handleOption, currentOption }) => {
       </div>
       <div
         className={`lg:w-1/4 ml-auto w-9/10 p-2 h-56 ${
-          (isSmall(breakpoint) || isMedium(breakpoint) || isLarge(breakpoint))? currentOption !== 2
-            ? "hidden"
-            : "visible"
-            :"hidden"
+          isSmall(breakpoint) || isMedium(breakpoint) || isLarge(breakpoint)
+            ? currentOption !== 2
+              ? "hidden"
+              : "visible"
+            : "hidden"
         }`}
       >
         <LearderBoard />

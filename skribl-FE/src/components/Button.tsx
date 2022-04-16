@@ -8,20 +8,24 @@ interface Props {
   type?: "button" | "submit";
   disabled?: boolean;
   icon?: IconType;
-  iconBorder?:boolean;
+  iconBorder?: boolean;
 }
 
 const Button: React.FC<Props> = (props) => {
   const normalButtonClass = useMemo(
-    () => `border-2 border-black text-xl p-2 rounded-md 
-  text-center w-40 shadow-lg hover:scale-110 hover:text-2xl h-12  
+    () => `border-2 border-primary bg-tertiary-2 hover:bg-transparent text-2xl p-2 rounded-md 
+  text-center w-44 shadow-lg hover:scale-110 hover:text-2xl h-14  
   disabled:opacity-60 ${props.className} `,
     []
   );
 
   const iconButtonClass = useMemo(
     () =>
-      `w-10 h-10 ${props.iconBorder ? "border border-black rounded-md":""} ${props.className} `,
+      `w-10 h-10 ${
+        props.iconBorder
+          ? "border-2 border-primary rounded-md text-secondary-1 bg-tertiary-2 bg-opacity-60 "
+          : ""
+      } ${props.className} `,
     []
   );
 
@@ -32,8 +36,7 @@ const Button: React.FC<Props> = (props) => {
       onClick={props.onClick}
       disabled={props.disabled}
     >
-      {" "}
-      {props.icon && <props.icon className="w-full h-full hover:animate-pulse" />}
+      {props.icon && <props.icon className="w-full h-full hover:scale-110" />}
       {props.children && <p>{props.children}</p>}
     </button>
   );
@@ -41,7 +44,7 @@ const Button: React.FC<Props> = (props) => {
 
 Button.defaultProps = {
   type: "button",
-  iconBorder:true
+  iconBorder: true,
 };
 
 export default React.memo(Button);

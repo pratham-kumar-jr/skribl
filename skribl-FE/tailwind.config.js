@@ -2,8 +2,25 @@ module.exports = {
   content: ["./src/**/*.{js,jsx,ts,tsx}", "./index.html"],
   theme: {
     extend: {
+      colors: {
+        primary: "#6d597a",
+        secondary: {
+          1: "#515575",
+          2: "#b56576",
+        },
+        tertiary: {
+          1: "#e56b6f",
+          2: "#eaac8b",
+        },
+      },
       backgroundImage: {
-        doodle: "url('./src/assests/bg.jpeg')",
+        doodle: "url('./src/assests/bg.jpg')",
+      },
+      backgroundSize: {
+        "60%": "60%",
+        "40%": "40%",
+        "20%": "20%",
+        "30%": "30%",
       },
       fontFamily: {
         title: ["whale"],

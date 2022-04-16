@@ -39,14 +39,12 @@ const AvatarCanvasArea: React.FC<Props> = ({ tool, drawing, setDrawing }) => {
   }, []);
 
   return (
-    <>
-      <Canvas
-        onDraw={onDrawing}
-        onStart={startDrawing}
-        onStop={endDrawing}
-        onEnd={onExit}
-      />
-    </>
+    <Canvas
+      onDraw={onDrawing}
+      onStart={startDrawing}
+      onStop={endDrawing}
+      onEnd={onExit}
+    />
   );
 };
 

@@ -13,7 +13,6 @@ import {
   useBreakPoint,
 } from "../hooks/useBreakPoint";
 import AvatarCanvasArea from "../components/AvatarCanvasArea";
-import avatarImage from "../assests/avatar.png";
 import { canvasService } from "../services/CanvasService";
 import { FiHelpCircle } from "react-icons/fi";
 import { TiPencil } from "react-icons/ti";
@@ -22,7 +21,12 @@ import { AiOutlineClear } from "react-icons/ai";
 import { GiPerspectiveDiceSixFacesRandom } from "react-icons/gi";
 import store from "../store";
 import { CursorTypeEnum } from "../enums/CursorTypeEnum";
-
+import Character1 from "./../assests/characters/colored/C1.png";
+import Character2 from "./../assests/characters/colored/C2.png";
+import Character3 from "./../assests/characters/colored/C3.png";
+import Character4 from "./../assests/characters/colored/C4.png";
+import Character5 from "./../assests/characters/colored/C5.png";
+import CharacterSelector from "../components/CharacterSelector";
 interface Props {
   roomId: string;
 }
@@ -30,6 +34,7 @@ interface Props {
 const MainPage: React.FC<Props> = ({ roomId }) => {
   const [name, setName] = useState("");
   const [defaultavatar, setDefaultavatar] = useState(true);
+  const [currentCharacter, setCurrentCharacter] = useState(Character1);
 
   const [drawing, setDrawing] = useState(false);
   const [tool, setTool] = useState(0);
@@ -75,6 +80,11 @@ const MainPage: React.FC<Props> = ({ roomId }) => {
     setDefaultavatar((t) => !t);
   }, []);
 
+  useEffect(() => {
+    if (!defaultavatar) {
+      store.canvasStore.setCursor(CursorTypeEnum.PENCIL);
+    }
+  }, [defaultavatar]);
   const selectPencil = () => {
     setDefaultavatar(false);
     store.canvasStore.setCursor(CursorTypeEnum.PENCIL);
@@ -95,23 +105,33 @@ const MainPage: React.FC<Props> = ({ roomId }) => {
   return (
     <div
       className="lg:w-4/5 lg:h-4/5 xl:h-2/3 xl:w-2/4 lg:mx-auto h-full 
-  w-full p-2  border shadow-lg rounded-md border-black 
+  w-full p-2 shadow-lg rounded-md  bg-white bg-opacity-10
   lg:flex lg:flex-row lg:justify-start lg:items-stretch"
     >
-      <div className="xl:w-2/6 lg:w-2/5 p-2 h-4/6 lg:h-full">
+      <div className="p-2 lg:h-full lg:w-2/5">
         <Header className="mx-auto lg:hidden">Skribble</Header>
-        <h2 className="text-center my-2 text-xl">Draw your avatar</h2>
-        <div className=" border-2 p-2 h-4/6 lg:h-5/6 border-black rounded-md">
-          <div className="m-1 border-2 border-black w-full md:w-1/2 mx-auto h-4/6 lg:w-full lg:h-3/5 rounded-md">
-            <div className={`${defaultavatar ? "hidden" : ""} w-full h-full`}>
+        <div className=" p-2 w-full rounded-md">
+          <div className="m-1 shadow-lg w-full md:w-1/2 mx-auto lg:w-full lg:h-3/5 rounded-xl h-72">
+            <div
+              className={`${
+                defaultavatar ? "hidden" : ""
+              } w-full bg-tertiary-2  h-80 rounded-xl `}
+            >
               <AvatarCanvasArea
                 tool={tool}
                 drawing={drawing}
                 setDrawing={setDrawing}
               />
             </div>
-            <div className={`${!defaultavatar ? "hidden" : ""} w-full h-full`}>
-              <img src={avatarImage} className="object-fit w-full h-full"></img>
+            <div
+              className={`${
+                !defaultavatar ? "hidden" : ""
+              } w-full h-full bg-secondary-1 bg-opacity-60 rounded-xl `}
+            >
+              <img
+                src={currentCharacter}
+                className=" object-fill w-full h-80"
+              />
             </div>
           </div>
           <div className=" flex space-x-2 p-1 justify-center">
@@ -129,7 +149,7 @@ const MainPage: React.FC<Props> = ({ roomId }) => {
               onChange={handleInput}
               onKeyDown={(e) => e.key === "Enter" && handlePlay()}
               placeholder={"Enter your name"}
-              className={" border-2 border-black rounded-md "}
+              className={" border-2 border-primary rounded-md "}
             />
             {/* <Button icon={true} className={"flex-shrink-0"}>
               R
@@ -137,15 +157,21 @@ const MainPage: React.FC<Props> = ({ roomId }) => {
           </div>
         </div>
       </div>
-      <div className="lg:w-4/6 h-2/6 lg:h-full  p-2 relative">
+      <div className=" lg:h-full w-3/5 p-2 relative">
         {!(
           isMedium(breakPoint) ||
           isLarge(breakPoint) ||
           isSmall(breakPoint)
         ) && <Header className="mx-auto">Skribble</Header>}
-        <div className="lg:mt-6 mx-auto max-w-max lg:ml-4">
+        <div className="lg:mt-12 mx-auto max-w-max ">
           <Button onClick={handlePlay}>Play</Button>
         </div>
+        <CharacterSelector
+          setCurrentCharacter={setCurrentCharacter}
+          className={"absolute bottom-20 left-10"}
+        >
+          {[Character1, Character2, Character3, Character4, Character5]}
+        </CharacterSelector>
         <Button icon={FiHelpCircle} className={`absolute bottom-3 right-3`} />
       </div>
     </div>
