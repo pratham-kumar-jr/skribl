@@ -1,4 +1,8 @@
+import { observer } from "mobx-react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import { CursorTypeEnum } from "../enums/CursorTypeEnum";
+import { Point } from "../models/interface/Point";
+import store from "../store";
 import { canvasStore } from "../store/CanvasStore";
 interface Props {
   onDraw: (
@@ -13,10 +17,6 @@ interface Props {
   className?: string;
   onEnd: () => void;
 }
-interface Point {
-  X: number;
-  Y: number;
-}
 
 const Canvas: React.FC<Props> = ({
   onDraw,
@@ -27,8 +27,7 @@ const Canvas: React.FC<Props> = ({
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [start, setStart] = useState<Point>({ X: 0, Y: 0 });
-
-  const { Height, Width } = canvasStore;
+  const { height, width, cursor } = canvasStore;
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -40,19 +39,19 @@ const Canvas: React.FC<Props> = ({
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    canvas.height = Height;
-    canvas.width = Width;
+    canvas.height = height;
+    canvas.width = width;
     canvas.style.height = "100%";
     canvas.style.width = "100%";
-  }, [Height, Width]);
+  }, [height, width]);
 
   const startDrawing = useCallback(
     ({ nativeEvent }: any) => {
       let { offsetX, offsetY } = nativeEvent;
       const canvas = canvasRef.current;
       if (!canvas) return;
-      if(window.TouchEvent){
-        if(nativeEvent.changedTouches?.length){
+      if (window.TouchEvent) {
+        if (nativeEvent.changedTouches?.length) {
           offsetX = nativeEvent.changedTouches[0].clientX - canvas.offsetLeft;
           offsetY = nativeEvent.changedTouches[0].clientY - canvas.offsetTop;
         }
@@ -74,13 +73,17 @@ const Canvas: React.FC<Props> = ({
     onEnd();
   }, [onEnd]);
 
+  const canvasEnter = useCallback(() => {
+    store.canvasStore.setCursor(cursor);
+  }, [cursor]);
+
   const draw = useCallback(
     ({ nativeEvent }: any) => {
       let { offsetX, offsetY } = nativeEvent;
       const canvas = canvasRef.current;
       if (!canvas) return;
-      if(window.TouchEvent){
-        if(nativeEvent.changedTouches?.length){
+      if (window.TouchEvent) {
+        if (nativeEvent.changedTouches?.length) {
           offsetX = nativeEvent.changedTouches[0].clientX - canvas.offsetLeft;
           offsetY = nativeEvent.changedTouches[0].clientY - canvas.offsetTop;
         }
@@ -105,11 +108,14 @@ const Canvas: React.FC<Props> = ({
       onTouchStart={startDrawing}
       onTouchEnd={finishDrawing}
       onTouchMove={draw}
-      className={className}
+      onMouseEnter={canvasEnter}
+      className={`${className} ${cursor}`}
     />
   );
 };
 
-Canvas.defaultProps = {};
+Canvas.defaultProps = {
+  className: "",
+};
 
-export default React.memo(Canvas);
+export default observer(Canvas);

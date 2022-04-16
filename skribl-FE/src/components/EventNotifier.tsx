@@ -5,6 +5,7 @@ import store from "../store";
 import Button from "./Button";
 import Notification from "../components/Notification";
 import { isEmpty } from "lodash";
+import { CursorTypeEnum } from "../enums/CursorTypeEnum";
 
 interface Props {}
 
@@ -18,6 +19,7 @@ const EventNotifier: React.FC<Props> = (props) => {
       <Button
         onClick={() => {
           roundService.roundSyncClient(word);
+          store.canvasStore.setCursor(CursorTypeEnum.PENCIL);
         }}
         key={word}
       >
@@ -30,17 +32,15 @@ const EventNotifier: React.FC<Props> = (props) => {
   const [wordReveal, setWordReveal] = useState(false);
 
   useEffect(() => {
-    if(myChance || !drawer)
-    return;
+    if (myChance || !drawer) return;
     setNotifySelection(true);
     setTimeout(() => {
       setNotifySelection(false);
     }, 2000);
-  }, [choosing,myChance,drawer]);
+  }, [choosing, myChance, drawer]);
 
   useEffect(() => {
-    if(myChance || choosing)
-      return;
+    if (myChance || choosing) return;
     if (currentWord) {
       setWordReveal(true);
       setTimeout(() => {

@@ -1,5 +1,5 @@
 import { action, computed, makeObservable, observable } from "mobx";
-import { CursorTypes } from "../enums/CursorTypes";
+import { CursorTypeEnum } from "../enums/CursorTypeEnum";
 
 class CanvasStore {
   private static _instance: CanvasStore | null;
@@ -14,7 +14,7 @@ class CanvasStore {
   private _width: number;
 
   @observable
-  private _cursor: string;
+  private _cursor: CursorTypeEnum;
 
   @action
   public setCanvas(canvas: HTMLCanvasElement) {
@@ -32,22 +32,22 @@ class CanvasStore {
   }
 
   @action
-  public setCursor(cursor: string) {
+  public setCursor(cursor: CursorTypeEnum) {
     this._cursor = cursor;
   }
 
   @computed
-  public get Height(): number {
+  public get height(): number {
     return this._height;
   }
 
   @computed
-  public get Width(): number {
+  public get width(): number {
     return this._width;
   }
 
   @computed
-  public get Cursor(): string {
+  public get cursor(): CursorTypeEnum {
     return this._cursor;
   }
 
@@ -59,7 +59,7 @@ class CanvasStore {
   private constructor() {
     this._height = 500;
     this._width = 500;
-    this._cursor = CursorTypes.DEFAULT;
+    this._cursor = CursorTypeEnum.DEFAULT;
     makeObservable(this);
   }
 
